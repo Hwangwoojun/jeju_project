@@ -1,0 +1,74 @@
+.sidebar {
+    height: 100vh;
+    width: 500px;
+    background-color: #fff;
+    z-index: 2;
+    position: relative;
+}
+
+.sidebar_header {
+    padding-top: 16px;
+    padding-left: 3px;
+    display: flex;
+    align-items: center;
+
+}
+
+.sidebar_logo {
+    width: 224px;
+    height: 51px;
+    margin-right: 15px;
+}
+
+.sidebar_button {
+    width: 160px;
+    height: 40px;
+    background: #0073bd url("../../public/images/ico_login_bg.png") no-repeat right 10px top 3px;
+    font-size: 15px;
+    color: white;
+    border-radius: 45px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    border: none;
+    margin-top: -7px;
+    cursor: pointer;
+}
+
+.sidebar_aside ul {
+    border-top: 1px solid #f5f5f5;
+    list-style: none;
+    margin-top: 9px;
+    padding: 0;
+}
+
+.sidebar_aside li {
+    cursor: pointer;
+    height: 100px;
+    width: 100px;
+}
+
+.sidebar_aside li a {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    align-items: center;
+    height: 100px;
+    width: 100px;
+    justify-content: center;
+
+}
+.sidebar_span {
+    font-size: 14px;
+    font-weight: 500;
+    color: #727171;
+    line-height: 16px;
+}
+
+li.active .sidebar_span {
+    color: white;
+}
+
+.sidebar_aside li.active {
+    background-color: #0073bd;
+}
+

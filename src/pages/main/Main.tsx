@@ -1,30 +1,26 @@
-import { useEffect, useRef } from 'react';
-import Sidebar from '../../components/sidebar/sidebar';
-import { vworldMap } from '../../services/VworldApis.ts'; // ← 네가 만든 map 객체 import
+import { useEffect, useRef } from "react";
+import "../../styles/MainPage.css";
+import Sidebar from "../../components/sidebar/sidebar";
+import Toolbar from "../../components/toolbar/toolbar.tsx";
+import { initMap, removeMap } from "../../services/MapEvents";
 
 const Main = () => {
     const mapRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (mapRef.current) {
-            vworldMap.setTarget(mapRef.current);
+            initMap(mapRef.current);
         }
-
         return () => {
-            vworldMap.setTarget(undefined);
+            removeMap();
         };
     }, []);
 
     return (
-        <div style={{ display: 'flex' }}>
-
-                <Sidebar />
-
-            <div
-                ref={mapRef}
-                id="map"
-                style={{ width: '100%', height: '100vh', position: 'absolute', zIndex: 1 }}
-            />
+        <div className="Main">
+            <Sidebar />
+            <Toolbar />
+            <div ref={mapRef} id="map" className="vworld_map" />
         </div>
     );
 };

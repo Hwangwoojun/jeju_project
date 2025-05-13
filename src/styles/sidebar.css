@@ -1,9 +1,17 @@
 .sidebar {
+    transition: width 0.4s ease;
     height: 100vh;
     width: 500px;
     background-color: #fff;
     z-index: 2;
     position: relative;
+    overflow: hidden;
+}
+.sidebar.open {
+    width: 500px;
+}
+.sidebar.closed {
+    width: 100px;
 }
 
 .sidebar_header {
@@ -70,5 +78,21 @@ li.active .sidebar_span {
 
 .sidebar_aside li.active {
     background-color: #0073bd;
+}
+
+.sidebar_onoff {
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: -30px;
+    transform: translateY(-10%);
+    width: 30px;
+    height: 100px;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+    cursor: pointer;
+    border: none;
+    background-color: white;
+    z-index: 2;
 }
 

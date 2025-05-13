@@ -1,0 +1,90 @@
+.toolbar {
+    display: flex;
+    position: absolute;
+    top: 21px;
+    right: 35px;
+    z-index: 2;
+    align-items: center;
+}
+
+/* 버튼 그룹 스타일 */
+.toolbar_button {
+    margin-right: 30px;
+    display: flex;
+    background: white;
+    border-radius: 5px;
+    padding: 9.5px 19px;
+    gap: 25px;
+    list-style: none;
+    align-items: center;
+}
+
+.img_tool {
+    cursor: pointer;
+}
+
+.toolbar_map {
+    border: 2px solid #fff;
+    border-radius: 5px;
+}
+
+.toolbar_map button {
+    background-color: white;
+    width: 73px;
+    height: 44px;
+    border: none;
+    cursor: pointer;
+    color: #909090;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.toolbar_map button.active {
+    background-color: #0073bd;
+    color: white;
+}
+#base.active {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+#Satellite.active {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.ol-zoom {
+    position: absolute !important;
+    top: 110px;
+    right: 38px;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.ol-zoom-in,
+.ol-zoom-out {
+    width: 44px;
+    height: 44px;
+    color: #666;
+    font-size: 26px;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+.ol-zoom-in::after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: 42.4px;
+    width: 75%;
+    height: 1px;
+    border-top: 1px solid #eaeaea;
+}
+.ol-zoom-in:active,
+.ol-zoom-out:active {
+    background-color: #f2f2f2;
+}

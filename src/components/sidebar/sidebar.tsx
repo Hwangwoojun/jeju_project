@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../../styles/sidebar.css";
+import "../../styles/components/sidebar.css";
 
 const Sidebar = () => {
     const [activeMenu, setActiveMenu] = useState("검색");

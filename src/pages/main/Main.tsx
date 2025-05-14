@@ -1,18 +1,19 @@
 import { useEffect, useRef } from "react";
-import "../../styles/MainPage.css";
+import { setupMap } from "../../services/MapEvents";
+import "../../styles/page/MainPage.css";
+
 import Sidebar from "../../components/sidebar/sidebar";
 import Toolbar from "../../components/toolbar/toolbar.tsx";
-import { initMap, removeMap } from "../../services/MapEvents";
+import Legend from "../../components/legend/legend.tsx";
 
 const Main = () => {
     const mapRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (mapRef.current) {
-            initMap(mapRef.current);
-        }
+        setupMap(mapRef.current);
+
         return () => {
-            removeMap();
+            setupMap(null);
         };
     }, []);
 
@@ -20,6 +21,7 @@ const Main = () => {
         <div className="Main">
             <Sidebar />
             <Toolbar />
+            <Legend />
             <div ref={mapRef} id="map" className="vworld_map" />
         </div>
     );

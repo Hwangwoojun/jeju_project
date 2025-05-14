@@ -6,7 +6,7 @@ import { fromLonLat } from "ol/proj";
 
 const VWORLD_API_KEY = import.meta.env.VITE_VWORLD_API_KEY;
 
-// WMTS API 기본 지도
+// 기본 지도
 export const vworldBase = new TileLayer({
     source: new XYZ({
         url: `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Base/{z}/{y}/{x}.png`,
@@ -18,7 +18,7 @@ export const vworldBase = new TileLayer({
     zIndex: 2,
 });
 
-// WMTS API 위성 지도
+// 위성 지도
 export const vworldSatellite = new TileLayer({
     source: new XYZ({
         url: `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Satellite/{z}/{y}/{x}.jpeg`,

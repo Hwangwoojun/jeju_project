@@ -1,6 +1,5 @@
 import TileLayer from "ol/layer/Tile";
 import XYZ from "ol/source/XYZ";
-import axios from "axios";
 import {Map, View} from "ol";
 import { fromLonLat } from "ol/proj";
 
@@ -41,37 +40,3 @@ export const vworldMap = new Map ({
         maxZoom: 20,
     }),
 });
-
-// 검색 API
-export const vworldSearch = (
-    keyword: string,
-    type: 'PLACE' | 'ADDRESS' = 'PLACE',
-    category?: 'road' | 'parcel'
-) => {
-    const url = 'https://api.vworld.kr/req/search';
-
-    const params: Record<string, string> = {
-        service: 'search',
-        request: 'search',
-        version: '2.0',
-        format: 'json',
-        key: VWORLD_API_KEY,
-        type,
-        query: keyword,
-        size: '10',
-        page: '1',
-    };
-    if(type === 'ADDRESS' && category) {
-        params.category = category;
-    }
-
-    return axios
-        .get(url, {params})
-        .then((res) => {
-            return res.data.response.result.items;
-        })
-        .catch((error) => {
-            console.error('Vworld 검색 실패 :', error);
-            return[];
-        });
-};

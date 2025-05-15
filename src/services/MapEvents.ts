@@ -10,11 +10,15 @@ import Overlay from "ol/Overlay";
 import Feature from "ol/Feature";
 import "../styles/services/MapEnvents.css";
 
+// OpenLayers 관련 코드 모음
+
 const measureState = {
     draw: null as Draw | null,
     tooltip: null as HTMLElement | null,
     overlay: null as Overlay | null,
     sketch: null as Feature<Geometry> | null,
+    finalOverlays: [] as Overlay[],
+    lastPointerCoord: null as number[] | null,
 };
 
 const measureSource = new VectorSource();
@@ -60,57 +64,127 @@ export function changeMapType(type: "일반" | "위성") {
 export function measure(type: "distance" | "area" | "clear") {
     clearMeasure();
 
-    if(type === "clear") return;
+    if (type === "clear") return;
 
     measureState.draw = new Draw({
         source: measureSource,
         type: type === "distance" ? "LineString" : "Polygon",
     });
 
-    measureState.sketch = null;
-    createHelpTooltip();
+    vworldMap.addInteraction(measureState.draw);
 
     measureState.draw.on("drawstart", (evt) => {
         measureState.sketch = evt.feature;
-        vworldMap.on("pointermove", pointerMoveHandler);
+        createHelpTooltip();
+
+        const geom = evt.feature.getGeometry();
+
+
+        geom?.on("change", () => {
+            let output = "";
+            let coord;
+
+            if (geom instanceof Polygon) {
+                output = formatArea(geom);
+                coord = geom.getInteriorPoint().getCoordinates();
+            } else if (geom instanceof LineString) {
+                output = formatLength(geom);
+                coord = geom.getLastCoordinate();
+            }
+
+            measureState.tooltip!.innerHTML = output;
+            measureState.overlay!.setPosition(coord);
+        });
     });
 
-    measureState.draw.on("drawend", () => {
-        if(measureState.overlay) {
-            measureState.overlay.setOffset([0, -15]);
+    measureState.draw.on("drawend", (evt) => {
+        vworldMap.un("pointermove", pointerMoveHandler);
+
+        const geom = evt.feature.getGeometry()?.clone();
+        const feature = evt.feature;
+
+        let output = "";
+        let coord;
+
+        if (geom instanceof Polygon) {
+            output = formatArea(geom);
+            coord = geom.getInteriorPoint().getCoordinates();
+        } else if (geom instanceof LineString) {
+            output = formatLength(geom);
+            coord = geom.getLastCoordinate();
         }
+
+        const finalTooltip = document.createElement("div");
+        finalTooltip.className = "tooltip tooltip-static";
+
+        const valueSpan = document.createElement("span");
+        valueSpan.textContent = output;
+
+        const closeBtn = document.createElement("span");
+        closeBtn.className = "tooltip-close";
+        closeBtn.textContent = "X";
+
+        finalTooltip.appendChild(valueSpan);
+        finalTooltip.appendChild(closeBtn);
+
+        const finalOverlay = new Overlay({
+            element: finalTooltip,
+            offset: [0, -10],
+            positioning: "bottom-center",
+        });
+
+        finalOverlay.setPosition(coord);
+        vworldMap.addOverlay(finalOverlay);
+        measureState.finalOverlays.push(finalOverlay);
+
+        closeBtn.addEventListener("click", () => {
+           vworldMap.removeOverlay(finalOverlay);
+           measureSource.removeFeature(feature);
+        });
+
+        if (measureState.tooltip?.parentNode) {
+            measureState.tooltip.parentNode.removeChild(measureState.tooltip);
+        }
+        if (measureState.overlay) {
+            vworldMap.removeOverlay(measureState.overlay);
+        }
+
         measureState.tooltip = null;
         measureState.overlay = null;
-        vworldMap.un("pointermove", pointerMoveHandler);
+        measureState.sketch = null;
+        measureState.lastPointerCoord = null;
     });
-    vworldMap.addInteraction(measureState.draw);
 }
 
-function pointerMoveHandler() {
-    if(!measureState.sketch) return;
+function pointerMoveHandler(evt: any) {
+    if(!measureState.sketch || !measureState.tooltip || !measureState.overlay) return;
 
     const geom = measureState.sketch.getGeometry();
     let output = "";
     let tooltipCoord;
 
-    if(geom instanceof  Polygon) {
+    if(geom instanceof Polygon) {
         output = formatArea(geom);
         tooltipCoord = geom.getInteriorPoint().getCoordinates();
-    }
+    } 
     else if (geom instanceof LineString) {
         output = formatLength(geom);
         tooltipCoord = geom.getLastCoordinate();
     }
 
-    if(measureState.tooltip) measureState.tooltip.innerHTML = output;
-    if(measureState.overlay) measureState.overlay.setPosition(tooltipCoord);
-
+    measureState.lastPointerCoord = evt.coordinate;
+    measureState.tooltip.innerHTML = output;
+    measureState.overlay.setPosition(tooltipCoord);
 }
 
 function createHelpTooltip() {
-    if(measureState.tooltip) {
-        measureState.tooltip.parentNode?.removeChild(measureState.tooltip);
+    if(measureState.tooltip?.parentNode) {
+        measureState.tooltip.parentNode.removeChild(measureState.tooltip);
     }
+    if(measureState.overlay) {
+        vworldMap.removeOverlay(measureState.overlay);
+    }
+
     measureState.tooltip = document.createElement("div");
     measureState.tooltip.className = "tooltip tooltip-measure";
     measureState.overlay = new Overlay({
@@ -122,12 +196,12 @@ function createHelpTooltip() {
 }
 
 function formatLength(line: LineString): string {
-    const length = getLineLength(line);
+    const length = getLineLength(line, { projection: vworldMap.getView().getProjection() });
     return length > 100 ? `${(length / 1000).toFixed(2)} km` : `${length.toFixed(1)} m`;
 }
 
 function formatArea(polygon: Polygon): string {
-    const area = getPolygonArea(polygon);
+    const area = getPolygonArea(polygon, { projection: vworldMap.getView().getProjection() });
     return area > 10000 ? `${(area / 1000000).toFixed(2)} km²` : `${area.toFixed(1)} m²`;
 }
 
@@ -142,6 +216,14 @@ export function clearMeasure() {
         vworldMap.removeOverlay(measureState.overlay);
         measureState.overlay = null;
     }
+
+    if(measureState.tooltip?.parentNode) {
+        measureState.tooltip.parentNode.removeChild(measureState.tooltip);
+        measureState.tooltip = null;
+    }
+
+    measureState.finalOverlays.forEach((overlay) => vworldMap.removeOverlay(overlay));
+    measureState.finalOverlays = [];
+    measureState.sketch = null;
+    measureState.lastPointerCoord = null;
 }
-
-

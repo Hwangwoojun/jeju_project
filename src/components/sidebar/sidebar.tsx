@@ -38,7 +38,7 @@ const Sidebar = () => {
                         <a href="#">
                             <img src={`/images/ico_menu02_${activeMenu === "주제도" ? "on" : "off"}.png`} alt="주제도"
                                 className="con_icon" />
-                            <span className="sidebar_span">주제도</span>
+                            <span className="sidebar_span">산불진단 서비스</span>
                         </a>
                     </li>
                 </ul>

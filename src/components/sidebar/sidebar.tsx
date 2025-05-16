@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "../../styles/components/sidebar.css";
+import Search from "../../components/search/search.tsx";
 
 const Sidebar = () => {
     const [activeMenu, setActiveMenu] = useState("검색");
@@ -43,8 +44,10 @@ const Sidebar = () => {
                     </li>
                 </ul>
             </aside>
-
+                <Search visible={activeMenu === "검색"} />
         </div>
+
+
 
             <button className="sidebar_onoff" onClick={() => setIsOpen(!isOpen)}>
                 <img src={isOpen ? "/images/ico_lnb_left_arr.png" : "/images/ico_lnb_right_arr.png"} alt="onoff" />

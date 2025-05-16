@@ -1,21 +1,33 @@
-import axios from "axios";
-
 const VWORLD_API_KEY = import.meta.env.VITE_VWORLD_API_KEY;
-
 const VWORLD_SEARCH_URL = "https://api.vworld.kr/req/search";
 
-/**
- * 합치 검색 (PLACE)
- * @param keyword 검색 키워드 (ex: 서울)
- * @param page 페이지 번호 (default: 1)
- * @param size 페이지 당 결과 수 (default: 5)
- */
+function buildUrl(params: Record<string, string>): string {
+    const query = new URLSearchParams(params).toString();
+    return `${VWORLD_SEARCH_URL}?${query}`;
+}
 
+function jsonpRequest(url: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+        const callbackName = `jsonp_callback${Math.round(Math.random() * 100000)}`;
+        (window as any)[callbackName] = (data: any) => {
+            delete (window as any)[callbackName];
+            document.body.removeChild(script);
+            resolve(data);
+        };
+
+        const script = document.createElement("script");
+        script.src = `${url}&callback=${callbackName}`;
+        script.onerror = reject;
+        document.body.append(script);
+    });
+}
+
+// 장소 검색
 export const searchPlace = (
     keyword: string,
     page: number = 1,
     size: number = 5
-): Promise<any []> => {
+): Promise<{ items: any[], total: number }> => {
     const params: Record<string, string> = {
         service: "search",
         request: "search",
@@ -28,28 +40,27 @@ export const searchPlace = (
         size: String(size),
     };
 
-    return axios.get(VWORLD_SEARCH_URL, {params})
-        .then((res) => res.data?.response?.result?.item ?? [])
+    const url = buildUrl(params);
+
+    return jsonpRequest(url)
+        .then((res) => {
+            const items = res?.response?.result?.items ?? [];
+            const total = Number(res?.response?.record?.total ?? 0);
+            return { items, total };
+        })
         .catch((error) => {
-            console.error("[Vworld]장소 검색 실패 :", error);
-            return [];
+            console.error("[VWorld] 장소 검색 실패:", error);
+            return { items: [], total: 0 };
         });
 };
 
-/**
- * 지방주소 검색  (ADDRESS)
- * @param keyword 검색 키워드
- * @param category 보호 목적 ("road": 로명지방, "parcel": 지방주소)
- * @param page 페이지 번호
- * @param size 검색 결과 수
- */
-
+// 주소 검색
 export const searchAddress = (
     keyword: string,
     category: "road" | "parcel",
     page: number = 1,
     size: number = 5
-): Promise<any []> => {
+): Promise<{ items: any[], total: number }> => {
     const params: Record<string, string> = {
         service: "search",
         request: "search",
@@ -63,19 +74,25 @@ export const searchAddress = (
         size: String(size),
     };
 
-    return axios.get(VWORLD_SEARCH_URL, {params})
-        .then((res) => res.data?.response?.result?.items ?? [])
+    const url = buildUrl(params);
+
+    return jsonpRequest(url)
+        .then((res) => {
+            const items = res?.response?.result?.items ?? [];
+            const total = Number(res?.response?.record?.total ?? 0);
+            return { items, total };
+        })
         .catch((error) => {
-            console.error("[Vworld] 주소 검색 실패 : ", error);
-            return [];
+            console.error("[VWorld] 주소 검색 실패:", error);
+            return { items: [], total: 0 };
         });
 };
 
+// 통합검색: 장소 검색 호출
 export const searchCombinedStep = (
     keyword: string,
     page: number = 1,
     size: number = 5
-): Promise<any []> => {
+): Promise<{ items: any[], total: number }> => {
     return searchPlace(keyword, page, size);
 };
-

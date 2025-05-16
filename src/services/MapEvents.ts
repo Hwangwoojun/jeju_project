@@ -30,7 +30,7 @@ const measureLayer = new VectorLayer({
         stroke: new Stroke({ color: "#ffcc33", width: 2 }),
     }),
 });
-measureLayer.setZIndex(2);
+measureLayer.setZIndex(4);
 
 export function setupMap(targetElement: HTMLElement | null) {
     if (targetElement) {

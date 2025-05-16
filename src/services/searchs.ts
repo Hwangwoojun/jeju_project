@@ -22,12 +22,11 @@ function jsonpRequest(url: string): Promise<any> {
     });
 }
 
-// 장소 검색
 export const searchPlace = (
     keyword: string,
     page: number = 1,
     size: number = 5
-): Promise<{ items: any[], total: number }> => {
+): Promise<{ items: any[]; total: number }> => {
     const params: Record<string, string> = {
         service: "search",
         request: "search",
@@ -54,7 +53,6 @@ export const searchPlace = (
         });
 };
 
-// 주소 검색
 export const searchAddress = (
     keyword: string,
     category: "road" | "parcel",
@@ -88,11 +86,10 @@ export const searchAddress = (
         });
 };
 
-// 통합검색: 장소 검색 호출
 export const searchCombinedStep = (
     keyword: string,
     page: number = 1,
     size: number = 5
-): Promise<{ items: any[], total: number }> => {
+): Promise<{ items: any[]; total: number }> => {
     return searchPlace(keyword, page, size);
 };

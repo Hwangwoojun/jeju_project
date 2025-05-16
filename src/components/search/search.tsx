@@ -83,9 +83,10 @@ const Search = ({ visible }: SearchProps) => {
                             <ul className="result_list">
                                 {(mode === "place" ? placeResults : addressResults).map((item, idx) => (
                                     <li className="result_list_item" key={idx}>
-                    <span>
-                      {mode === "place" ? item.title || "-" : item.address?.parcel || item.address?.road || "-"}
-                    </span>
+                            <span>
+                                {mode === "place" ? `${item.address?.parcel ?? ""} ${item.title ?? "-"}`
+                                    : item.address?.parcel || item.address?.road || "-"}
+                            </span>
                                         <button>이동</button>
                                     </li>
                                 ))}

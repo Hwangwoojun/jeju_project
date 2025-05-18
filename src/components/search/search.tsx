@@ -13,37 +13,51 @@ const Search = ({ visible }: SearchProps) => {
     const [mode, setMode] = useState<"place" | "address">("place");
     const [searchType, setSearchType] = useState<"combined" | "parcel">("combined");
     const [totalCount, setTotalCount] = useState(0);
-    const [currentPage, setCurrentPage] = useState(1);
+
+    const [placePage, setPlacePage] = useState(1);
+    const [addressPage, setAddressPage] = useState(1);
+
     const dataPerPage = 5;
     const pageCount = 10;
+
+    const currentPage = mode === "place" ? placePage : addressPage;
+
+    const totalPages = Math.ceil(totalCount / dataPerPage);
+    const pageGroup = Math.ceil(currentPage / pageCount);
+    const lastPage = Math.min(pageGroup * pageCount, totalPages);
+    const firstPage = (pageGroup - 1) * pageCount + 1;
 
     useEffect(() => {
         if (!keyword.trim()) return;
         handleSearch();
-    }, [currentPage, mode]);
+    }, [placePage, addressPage, mode]);
 
     const handleSearch = () => {
         if (!keyword.trim()) return;
 
         if (searchType === "combined") {
             if (mode === "place") {
-                searchCombinedStep(keyword, currentPage, dataPerPage).then(({ items, total }) => {
+                searchCombinedStep(keyword, placePage, dataPerPage).then(({ items, total }) => {
                     setPlaceResults(items);
                     setTotalCount(total);
                 });
             } else {
-                searchAddress(keyword, "parcel", currentPage, dataPerPage).then(({ items, total }) => {
-                    setAddressResults(items);
-                    setTotalCount(total);
-                });
+                searchAddress(keyword, "parcel", addressPage, dataPerPage)
+                    .then(({ items, total }) => {
+                        setAddressResults(items);
+                        setTotalCount(total);
+                    });
             }
         }
     };
 
-    const totalPages = Math.ceil(totalCount / dataPerPage);
-    const pageGroup = Math.ceil(currentPage / pageCount);
-    const lastPage = Math.min(pageGroup * pageCount, totalPages);
-    const firstPage = (pageGroup - 1) * pageCount + 1;
+    const handlePageChange = (page: number) => {
+        if (mode === "place") {
+            setPlacePage(page);
+        } else {
+            setAddressPage(page);
+        }
+    };
 
     if (!visible) return null;
 
@@ -51,18 +65,29 @@ const Search = ({ visible }: SearchProps) => {
         <div className="search_panel">
             <div className="search_type_toggle">
                 <button className={searchType === "combined" ? "active" : ""}
-                    onClick={() => setSearchType("combined")}>통합검색</button>
+                        onClick={() => setSearchType("combined")}>통합검색</button>
                 <button className={searchType === "parcel" ? "active" : ""}
-                    onClick={() => setSearchType("parcel")}>지번검색</button>
+                        onClick={() => setSearchType("parcel")}>지번검색</button>
             </div>
 
             {searchType === "combined" && (
                 <>
                     <div className="search_bar_wrapper">
-                        <input type="text" value={keyword}
-                            onChange={(e) => setKeyword(e.target.value)}
-                            placeholder="키워드 입력 ex)세화, 세화 산 1-1" />
-                        <button className="search_button" onClick={() => { setCurrentPage(1); handleSearch(); }}>검색</button>
+                        <input type="text" value={keyword} onChange={(e) => setKeyword(e.target.value)}
+                               onKeyDown={(e) => {
+                                   if(e.key === "Enter") {
+                                       setPlacePage(1);
+                                       setAddressPage(1);
+                                       handleSearch();
+                                   }
+                               }}
+                               placeholder="키워드 입력 ex)세화, 세화 산 1-1" />
+
+                        <button className="search_button" onClick={() => {
+                            setPlacePage(1);
+                            setAddressPage(1);
+                            handleSearch();
+                        }}>검색</button>
                     </div>
 
                     <div className="search_result_info">
@@ -71,9 +96,9 @@ const Search = ({ visible }: SearchProps) => {
 
                     <div className="result_toggle">
                         <button className={mode === "place" ? "active" : ""}
-                            onClick={() => { setMode("place"); setCurrentPage(1); }}>장소</button>
+                                onClick={() => setMode("place")}>장소</button>
                         <button className={mode === "address" ? "active" : ""}
-                            onClick={() => { setMode("address"); setCurrentPage(1); }}>주소</button>
+                                onClick={() => setMode("address")}>주소</button>
                     </div>
 
                     {(mode === "place" ? placeResults.length : addressResults.length) === 0 ? (
@@ -83,28 +108,32 @@ const Search = ({ visible }: SearchProps) => {
                             <ul className="result_list">
                                 {(mode === "place" ? placeResults : addressResults).map((item, idx) => (
                                     <li className="result_list_item" key={idx}>
-                            <span>
-                                {mode === "place" ? `${item.address?.parcel ?? ""} ${item.title ?? "-"}`
-                                    : item.address?.parcel || item.address?.road || "-"}
-                            </span>
+                                        <span>
+                                            {mode === "place"
+                                                ? `${item.address?.parcel ?? ""} ${item.title ?? "-"}`
+                                                : item.address?.parcel || item.address?.road || "-"}
+                                        </span>
                                         <button>이동</button>
                                     </li>
                                 ))}
                             </ul>
+
                             <div className="paging">
                                 {firstPage > 1 && (
-                                    <button className="paging-icon" onClick={() => setCurrentPage(firstPage - 1)}>
+                                    <button className="paging-icon" onClick={() => handlePageChange(firstPage - 1)}>
                                         <img src="/images/paging_start.png" alt="이전" />
                                     </button>
                                 )}
+
                                 {Array.from({ length: lastPage - firstPage + 1 },
                                     (_, idx) => firstPage + idx).map((page) => (
 
                                     <button key={page} className={page === currentPage ? "page-number active" : "page-number"}
-                                        onClick={() => setCurrentPage(page)}>{page}</button>
+                                            onClick={() => handlePageChange(page)}>{page}</button>
                                 ))}
+
                                 {lastPage < totalPages && (
-                                    <button className="paging-icon" onClick={() => setCurrentPage(lastPage + 1)}>
+                                    <button className="paging-icon" onClick={() => handlePageChange(lastPage + 1)}>
                                         <img src="/images/paging_end.png" alt="다음" />
                                     </button>
                                 )}

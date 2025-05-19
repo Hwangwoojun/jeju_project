@@ -1,5 +1,5 @@
 import { useState} from "react";
-import "../../styles/components/toolbar.css";
+import "../../styles/components/toolbar/toolbar.css";
 import { changeMapType, measure } from "../../services/MapEvents";
 
 const Toolbar = () => {

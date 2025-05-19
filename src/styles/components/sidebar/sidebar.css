@@ -31,7 +31,7 @@
 .sidebar_button {
     width: 160px;
     height: 40px;
-    background: #0073bd url("../../../public/images/ico_login_bg.png") no-repeat right 10px top 3px;
+    background: #0073bd url("../../../../public/images/ico_login_bg.png") no-repeat right 10px top 3px;
     font-size: 15px;
     color: white;
     border-radius: 45px;
@@ -46,6 +46,7 @@
     list-style: none;
     margin-top: 9px;
     padding: 0;
+    border-top: 1px solid #f5f5f5;
 }
 
 .sidebar_aside li {

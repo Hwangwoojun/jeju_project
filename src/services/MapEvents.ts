@@ -3,11 +3,12 @@ import { ScaleLine } from "ol/control";
 import Draw from "ol/interaction/Draw";
 import VectorSource from "ol/source/Vector";
 import VectorLayer from "ol/layer/Vector";
-import { Style, Stroke, Fill } from "ol/style";
-import { LineString, Polygon, Geometry } from "ol/geom";
+import { Style, Stroke, Fill, Icon } from "ol/style";
+import { LineString, Polygon, Geometry, Point } from "ol/geom";
 import { getLength as getLineLength, getArea as getPolygonArea } from "ol/sphere";
 import Overlay from "ol/Overlay";
 import Feature from "ol/Feature";
+import { fromLonLat } from "ol/proj";
 import "../styles/services/MapEnvents.css";
 
 // OpenLayers 관련 코드 모음
@@ -32,6 +33,47 @@ const measureLayer = new VectorLayer({
 });
 measureLayer.setZIndex(4);
 
+const markerSource = new VectorSource();
+const markerLayer = new VectorLayer({
+    source: markerSource,
+    zIndex: 4,
+});
+
+const markerImageUrl = "/images/point2.png";
+
+export function initMarkerLayer() {
+    if (!vworldMap.getLayers().getArray().includes(markerLayer)) {
+        vworldMap.addLayer(markerLayer);
+    }
+}
+
+export function addMovingMarker(lon: number, lat: number) {
+    // 기존 마커 삭제
+    markerSource.clear();
+
+    // 경도/위도 → OpenLayers 내부 좌표계로 변환
+    const coord = fromLonLat([lon, lat]);
+
+    const marker = new Feature({
+        geometry: new Point(coord),
+    });
+
+    marker.setStyle(
+        new Style({
+            image: new Icon({
+                src: markerImageUrl,
+                anchor: [0.5, 1],
+                scale: 1,
+            }),
+        })
+    );
+
+    markerSource.addFeature(marker);
+
+    vworldMap.getView().setCenter(coord);
+    vworldMap.getView().setZoom(18);
+}
+
 export function setupMap(targetElement: HTMLElement | null) {
     if (targetElement) {
         vworldMap.setTarget(targetElement);
@@ -46,6 +88,8 @@ export function setupMap(targetElement: HTMLElement | null) {
 
         if (!vworldMap.getLayers().getArray().includes(measureLayer)) {
             vworldMap.addLayer(measureLayer);
+
+            initMarkerLayer();
         }
     } else {
         vworldMap.setTarget(undefined);
@@ -58,6 +102,10 @@ export function changeMapType(type: "일반" | "위성") {
 
     if (!vworldMap.getLayers().getArray().includes(measureLayer)) {
         vworldMap.addLayer(measureLayer);
+    }
+
+    if (!vworldMap.getLayers().getArray().includes(markerLayer)) {
+        vworldMap.addLayer(markerLayer);
     }
 }
 

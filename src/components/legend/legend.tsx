@@ -1,4 +1,4 @@
-import "../../styles/components/legend.css";
+import "../../styles/components/legend/legend.css";
 
 const Legend = () => {
     return (

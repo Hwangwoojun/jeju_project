@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { searchCombinedStep, searchAddress } from "../../services/searchs";
-import "../../styles/components/search.css";
+import { searchCombinedStep, searchAddress } from "../../services/Searchs.ts";
+import { addMovingMarker, initMarkerLayer } from "../../services/MapEvents";
+import Region from "../region/region.tsx";
+import "../../styles/components/search/search.css";
 
 interface SearchProps {
     visible: boolean;
@@ -10,9 +12,10 @@ const Search = ({ visible }: SearchProps) => {
     const [keyword, setKeyword] = useState("");
     const [placeResults, setPlaceResults] = useState<any[]>([]);
     const [addressResults, setAddressResults] = useState<any[]>([]);
+    const [placeTotal, setPlaceTotal] = useState(0);
+    const [addressTotal, setAddressTotal] = useState(0);
     const [mode, setMode] = useState<"place" | "address">("place");
     const [searchType, setSearchType] = useState<"combined" | "parcel">("combined");
-    const [totalCount, setTotalCount] = useState(0);
 
     const [placePage, setPlacePage] = useState(1);
     const [addressPage, setAddressPage] = useState(1);
@@ -21,7 +24,7 @@ const Search = ({ visible }: SearchProps) => {
     const pageCount = 10;
 
     const currentPage = mode === "place" ? placePage : addressPage;
-
+    const totalCount = mode === "place" ? placeTotal : addressTotal;
     const totalPages = Math.ceil(totalCount / dataPerPage);
     const pageGroup = Math.ceil(currentPage / pageCount);
     const lastPage = Math.min(pageGroup * pageCount, totalPages);
@@ -32,26 +35,37 @@ const Search = ({ visible }: SearchProps) => {
         handleSearch();
     }, [placePage, addressPage, mode]);
 
+    useEffect(() => {
+        initMarkerLayer();
+    }, []);
+
     const handleSearch = () => {
-        if (!keyword.trim()) return;
+        if (!keyword.trim()) {
+            alert("키워드를 입력해주세요.");
+            return;
+        }
 
         if (searchType === "combined") {
-            if (mode === "place") {
-                searchCombinedStep(keyword, placePage, dataPerPage).then(({ items, total }) => {
-                    setPlaceResults(items);
-                    setTotalCount(total);
-                });
-            } else {
-                searchAddress(keyword, "parcel", addressPage, dataPerPage)
-                    .then(({ items, total }) => {
-                        setAddressResults(items);
-                        setTotalCount(total);
-                    });
-            }
+            // 장소 검색
+            searchCombinedStep(keyword, placePage, dataPerPage).then(({ items, total }) => {
+                setPlaceResults(items);
+                setPlaceTotal(total);
+            });
+
+            // 주소 검색
+            searchAddress(keyword, "parcel", addressPage, dataPerPage).then(({ items, total }) => {
+                setAddressResults(items);
+                setAddressTotal(total);
+            });
         }
     };
 
     const handlePageChange = (page: number) => {
+        if (!keyword.trim()) {
+            alert("브이월드 서버 점검중입니다.");
+            return;
+        }
+
         if (mode === "place") {
             setPlacePage(page);
         } else {
@@ -64,56 +78,83 @@ const Search = ({ visible }: SearchProps) => {
     return (
         <div className="search_panel">
             <div className="search_type_toggle">
-                <button className={searchType === "combined" ? "active" : ""}
-                        onClick={() => setSearchType("combined")}>통합검색</button>
-                <button className={searchType === "parcel" ? "active" : ""}
-                        onClick={() => setSearchType("parcel")}>지번검색</button>
+                <button
+                    className={searchType === "combined" ? "active" : ""}
+                    onClick={() => setSearchType("combined")}
+                >
+                    통합검색
+                </button>
+                <button
+                    className={searchType === "parcel" ? "active" : ""}
+                    onClick={() => setSearchType("parcel")}
+                >
+                    지번검색
+                </button>
             </div>
 
             {searchType === "combined" && (
                 <>
                     <div className="search_bar_wrapper">
-                        <input type="text" value={keyword} onChange={(e) => setKeyword(e.target.value)}
-                               onKeyDown={(e) => {
-                                   if(e.key === "Enter") {
-                                       setPlacePage(1);
-                                       setAddressPage(1);
-                                       handleSearch();
-                                   }
-                               }}
-                               placeholder="키워드 입력 ex)세화, 세화 산 1-1" />
+                        <input type="text" value={keyword}
+                            onChange={(e) => setKeyword(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    setPlacePage(1);
+                                    setAddressPage(1);
+                                    handleSearch();
+                                }
+                            }}
+                            placeholder="키워드 입력 ex)세화, 세화 산 1-1"/>
 
                         <button className="search_button" onClick={() => {
-                            setPlacePage(1);
-                            setAddressPage(1);
-                            handleSearch();
+                                setPlacePage(1);
+                                setAddressPage(1);
+                                handleSearch();
                         }}>검색</button>
+
                     </div>
 
                     <div className="search_result_info">
-                        <strong className="search_list">검색결과</strong> (총 {totalCount}건)
+                        <strong className="search_list">검색결과 </strong>
+                        <p className="total_list"> (총 {totalCount}건)</p>
                     </div>
 
                     <div className="result_toggle">
+
                         <button className={mode === "place" ? "active" : ""}
-                                onClick={() => setMode("place")}>장소</button>
-                        <button className={mode === "address" ? "active" : ""}
-                                onClick={() => setMode("address")}>주소</button>
+                            onClick={() => setMode("place")}>장소</button>
+
+                        <button
+                            className={mode === "address" ? "active" : ""}
+                            onClick={() => setMode("address")}>주소</button>
                     </div>
 
-                    {(mode === "place" ? placeResults.length : addressResults.length) === 0 ? (
-                        <div className="no_result">검색결과가 없습니다.</div>
+                    {(mode === "place" ? placeResults : addressResults).length === 0 ? (
+                        <div className="no_result">
+                            <div className="not_result">검색결과가 없습니다.</div>
+                        </div>
                     ) : (
                         <>
                             <ul className="result_list">
                                 {(mode === "place" ? placeResults : addressResults).map((item, idx) => (
                                     <li className="result_list_item" key={idx}>
-                                        <span>
-                                            {mode === "place"
-                                                ? `${item.address?.parcel ?? ""} ${item.title ?? "-"}`
-                                                : item.address?.parcel || item.address?.road || "-"}
-                                        </span>
-                                        <button>이동</button>
+                    <span>
+                      {mode === "place"
+                          ? `${item.address?.parcel ?? ""} ${item.title ?? "-"}`
+                          : item.address?.parcel || item.address?.road || "-"}
+                    </span>
+                           <button onClick={() => {
+                               const lon = parseFloat(item.point?.x);
+                               const lat = parseFloat(item.point?.y);
+
+                                  if (!isNaN(lon) && !isNaN(lat)) {
+                                        addMovingMarker(lon, lat);
+                                  }
+                                  else {
+                                    alert("위치 정보가 없습니다.");
+                                  }
+                               }}>이동</button>
+
                                     </li>
                                 ))}
                             </ul>
@@ -126,11 +167,14 @@ const Search = ({ visible }: SearchProps) => {
                                 )}
 
                                 {Array.from({ length: lastPage - firstPage + 1 },
-                                    (_, idx) => firstPage + idx).map((page) => (
+                                    (_, idx) => firstPage + idx).map(
+                                    (page) => (
 
-                                    <button key={page} className={page === currentPage ? "page-number active" : "page-number"}
+                                        <button key={page}
+                                            className={page === currentPage ? "page-number active" : "page-number"}
                                             onClick={() => handlePageChange(page)}>{page}</button>
-                                ))}
+                                    )
+                                )}
 
                                 {lastPage < totalPages && (
                                     <button className="paging-icon" onClick={() => handlePageChange(lastPage + 1)}>
@@ -145,7 +189,7 @@ const Search = ({ visible }: SearchProps) => {
 
             {searchType === "parcel" && (
                 <div className="parcel_placeholder">
-                    <p>지번검색 UI</p>
+                    <Region />
                 </div>
             )}
         </div>

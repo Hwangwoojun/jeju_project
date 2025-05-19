@@ -1,6 +1,7 @@
 import { useState } from "react";
-import "../../styles/components/sidebar.css";
+import "../../styles/components/sidebar/sidebar.css";
 import Search from "../../components/search/search.tsx";
+import Fireservice from "../../components/fireservice/fireservice.tsx";
 
 const Sidebar = () => {
     const [activeMenu, setActiveMenu] = useState("검색");
@@ -45,6 +46,7 @@ const Sidebar = () => {
                 </ul>
             </aside>
                 <Search visible={activeMenu === "검색"} />
+                <Fireservice visible={activeMenu === "주제도"} />
         </div>
 
 

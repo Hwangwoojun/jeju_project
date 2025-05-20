@@ -18,7 +18,7 @@ function loadJSONP(url: string, callback: Callback) {
     document.body.appendChild(script);
 }
 
-// 서울/부산만 선택지로 제한된 시/도 리스트
+// 시/도 리스트
 export function getSidoList(callback: Callback) {
     const data = [
         { code: "11", name: "서울특별시" },
@@ -27,19 +27,19 @@ export function getSidoList(callback: Callback) {
     callback(data);
 }
 
-// 시군구 리스트 (full_nm에서 시도 이름으로 필터링)
+// 시군구 리스트 (시도명 기반 조회)
 export function getSigunguList(sidoName: string, callback: Callback) {
     const url = `https://api.vworld.kr/req/data?service=data&request=GetFeature&data=LT_C_ADSIGG_INFO&format=json&type=jsonp&key=${API_KEY}&attrFilter=full_nm:like:${encodeURIComponent(sidoName)}`;
     loadJSONP(url, callback);
 }
 
-// 읍면동 리스트 (시군구 코드 기준)
+// 읍면동 리스트 (시군구 코드 기반)
 export function getEmdList(sigunguCode: string, callback: Callback) {
     const url = `https://api.vworld.kr/req/data?service=data&request=GetFeature&data=LT_C_ADEMD_INFO&format=json&type=jsonp&key=${API_KEY}&attrFilter=sig_cd:=:${sigunguCode}`;
     loadJSONP(url, callback);
 }
 
-// 지번 주소 검색 함수 추가
+// 지번 주소 검색
 export function searchParcelAddress(
     query: string,
     page: number,

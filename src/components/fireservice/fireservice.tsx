@@ -40,21 +40,21 @@ const FireService = ({ visible }: FireServiceProps) => {
         dayAfter: 50,
     });
 
-    const handleToggle = (id: LayerId) => {
+    const toggleExpand = (id: LayerId) => {
         setExpandedLayers(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
-    const handleOpacityChange = (id: LayerId, value: number) => {
+    const changeOpacity = (id: LayerId, value: number) => {
         setOpacity(prev => ({ ...prev, [id]: value }));
     };
 
-    const handleLayerCheckToggle = (id: LayerId) => {
+    const toggleLayerCheck = (id: LayerId) => {
         const newValue = !checkedLayers[id];
         setCheckedLayers(prev => ({ ...prev, [id]: newValue }));
         setActiveImages(prev => ({ ...prev, [id]: newValue }));
     };
 
-    const handleOpacityCheckToggle = (id: LayerId) => {
+    const toggleImageActive = (id: LayerId) => {
         setActiveImages(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
@@ -65,22 +65,22 @@ const FireService = ({ visible }: FireServiceProps) => {
             <h3 className="fire_title">산불진단 서비스 주제도</h3>
             {layers.map(layer => (
                 <div key={layer.id} className={`fire_layer_item ${expandedLayers[layer.id] ? "expanded" : ""}`}>
-                    <div className="fire_layer_header" onClick={() => handleToggle(layer.id)}>
+                    <div className="fire_layer_header" onClick={() => toggleExpand(layer.id)}>
 
                         <img src={`/images/chk_type02_${checkedLayers[layer.id] ? "on" : "off"}.png`}
                             alt="check" className="fire_checkbox"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                handleLayerCheckToggle(layer.id);
+                                toggleLayerCheck(layer.id);
                             }}/>
 
                         <span className="fire_layer_label" onClick={(e) => {
-                                e.stopPropagation(); // 🔒 상위 클릭 이벤트 막기
-                                handleLayerCheckToggle(layer.id);
+                                e.stopPropagation(); // 상위 클릭 이벤트 막기
+                                toggleLayerCheck(layer.id);
                             }}>{layer.label}</span>
 
                         <button className="fire_toggle_btn" onClick={(e) => {
-                                e.stopPropagation();handleToggle(layer.id); }}>
+                                e.stopPropagation(); toggleExpand(layer.id); }}>
 
                             <img src={`/images/ico_tg_${expandedLayers[layer.id] ? "up" : "down"}.png`} alt="toggle" />
 
@@ -94,23 +94,20 @@ const FireService = ({ visible }: FireServiceProps) => {
 
                                 <img src={`/images/chk_type02_${activeImages[layer.id] ? "on" : "off"}.png`}
                                     alt="check" className="fire_checkbox"
-                                    onClick={() => handleOpacityCheckToggle(layer.id)}
+                                    onClick={() => toggleImageActive(layer.id)}
                                 />
                                 <span className="fire_layer_label"
-                                    onClick={() => handleOpacityCheckToggle(layer.id)}>{layer.label}</span>
+                                    onClick={() => toggleImageActive(layer.id)}>{layer.label}</span>
 
                                 <div className="opacity_box_wrapper">
-
                                     <div className="opacity_box">
-
                                         <span className="opacity_text">{opacity[layer.id]}%</span>
-
                                         <div className="opacity_buttons">
 
                                             <button className="arrow_btn"
                                                 onClick={() => {
                                                     const newValue = Math.min(100, opacity[layer.id] + 10);
-                                                    handleOpacityChange(layer.id, newValue);
+                                                    changeOpacity(layer.id, newValue);
                                                 }}
                                                 disabled={!activeImages[layer.id]}>
 
@@ -120,7 +117,7 @@ const FireService = ({ visible }: FireServiceProps) => {
                                             <button className="arrow_btn"
                                                 onClick={() => {
                                                     const newValue = Math.max(0, opacity[layer.id] - 10);
-                                                    handleOpacityChange(layer.id, newValue);
+                                                    changeOpacity(layer.id, newValue);
                                                 }}
                                                 disabled={!activeImages[layer.id]}>
                                                 <img src="/images/ico_down.png" alt="down" />

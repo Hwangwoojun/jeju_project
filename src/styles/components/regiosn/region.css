@@ -1,58 +1,109 @@
-.region-search-ui {
+.region_search {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 16px;
+    gap: 14.5px;
+    padding: 20px;
     font-size: 14px;
+    background: #ebebeb;
 }
 
-.region-area {
+.area_search {
+    font-size: 15px;
+    font-weight: 500;
+    color: #434343;
+    margin: 0 0 0 -1px;
+}
+
+.region_area {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 10px;
 }
 
-.region-area select {
-    padding: 10px;
+.region_area select {
+    width: 175px;
+    height: 50px;
+    padding-left: 20px;
     font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #fff;
+    border-radius: 3px;
+    color: #727171;
+    background: #fff url("../../../../public/images/ico_select_arr.png") no-repeat right 20px center;
     appearance: none;
+    cursor: pointer;
+    border: none;
 }
 
-.region-jibun {
+.search_jibun {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: #434343;
+}
+
+.region_jibun {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     margin-top: 4px;
 }
 
-.region-jibun input {
-    flex: 1;
-    padding: 10px;
+.region_jibun input {
+    background-color: #fff;
+    border: none;
+    width: 153px;
+    height: 48px;
+    padding-left: 20px;
     font-size: 14px;
-    border: 1px solid #ccc;
     border-radius: 4px;
+    color: #434343;
 }
 
-.region-jibun button {
+.region_jibun_button {
     padding: 10px 20px;
-    background-color: #009f67;
+    background-color: #009f73;
     color: #fff;
     border: none;
-    border-radius: 4px;
-    font-weight: bold;
+    border-radius: 3px;
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
+    height: 50px;
 }
 
-.region-result {
-    margin-top: 20px;
-    padding: 10px;
+.region_result {
     background-color: #f9f9f9;
     border-radius: 4px;
+    padding-bottom: 350px;
 }
 
-.region-result p {
-    margin: 4px 0;
-    color: #555;
+.search_all {
+    display: flex;
+    align-items: center;
+    padding: 10px 0 0 0;
 }
+
+.search_result {
+    color: #434343;
+    font-size: 15px;
+    font-weight: 500;
+    padding-left: 20px;
+}
+
+.search_all_list {
+    color: #434343;
+    margin-left: 4px;
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.search_all_not {
+    padding: 18px 20px;
+    border-bottom: 1px solid #ebebeb;
+}
+
+.search_not {
+    margin: 0;
+    width: 400px;
+    font-size: 14px;
+    color: #434343;
+}
+

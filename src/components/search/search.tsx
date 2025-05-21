@@ -47,13 +47,13 @@ const Search = ({ visible }: SearchProps) => {
 
         if (searchType === "combined") {
             // 장소 검색
-            searchCombinedStep(keyword, placePage, dataPerPage).then(({ items, total }) => {
+            searchCombinedStep(keyword, placePage, dataPerPage).then(({items, total}) => {
                 setPlaceResults(items);
                 setPlaceTotal(total);
             });
 
             // 주소 검색
-            searchAddress(keyword, "parcel", addressPage, dataPerPage).then(({ items, total }) => {
+            searchAddress(keyword, "parcel", addressPage, dataPerPage).then(({items, total}) => {
                 setAddressResults(items);
                 setAddressTotal(total);
             });
@@ -95,7 +95,9 @@ const Search = ({ visible }: SearchProps) => {
             {searchType === "combined" && (
                 <>
                     <div className="search_bar_wrapper">
-                        <input type="text" value={keyword}
+                        <input
+                            type="text"
+                            value={keyword}
                             onChange={(e) => setKeyword(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
@@ -104,29 +106,40 @@ const Search = ({ visible }: SearchProps) => {
                                     handleSearch();
                                 }
                             }}
-                            placeholder="키워드 입력 ex)세화, 세화 산 1-1"/>
+                            placeholder="키워드 입력 ex)세화, 세화 산 1-1"
+                        />
 
-                        <button className="search_button" onClick={() => {
+                        <button
+                            className="search_button"
+                            onClick={() => {
                                 setPlacePage(1);
                                 setAddressPage(1);
                                 handleSearch();
-                        }}>검색</button>
-
+                            }}
+                        >
+                            검색
+                        </button>
                     </div>
 
                     <div className="search_result_info">
                         <strong className="search_list">검색결과 </strong>
-                        <p className="total_list"> (총 {totalCount}건)</p>
+                        <p className="total_list">(총 {totalCount}건)</p>
                     </div>
 
                     <div className="result_toggle">
-
-                        <button className={mode === "place" ? "active" : ""}
-                            onClick={() => setMode("place")}>장소</button>
+                        <button
+                            className={mode === "place" ? "active" : ""}
+                            onClick={() => setMode("place")}
+                        >
+                            장소
+                        </button>
 
                         <button
                             className={mode === "address" ? "active" : ""}
-                            onClick={() => setMode("address")}>주소</button>
+                            onClick={() => setMode("address")}
+                        >
+                            주소
+                        </button>
                     </div>
 
                     {(mode === "place" ? placeResults : addressResults).length === 0 ? (
@@ -134,27 +147,29 @@ const Search = ({ visible }: SearchProps) => {
                             <div className="not_result">검색결과가 없습니다.</div>
                         </div>
                     ) : (
-                        <>
+                        <div className="result_wrapper">
                             <ul className="result_list">
                                 {(mode === "place" ? placeResults : addressResults).map((item, idx) => (
                                     <li className="result_list_item" key={idx}>
-                    <span>
-                      {mode === "place"
-                          ? `${item.address?.parcel ?? ""} ${item.title ?? "-"}`
-                          : item.address?.parcel || item.address?.road || "-"}
-                    </span>
-                           <button onClick={() => {
-                               const lon = parseFloat(item.point?.x);
-                               const lat = parseFloat(item.point?.y);
+                  <span className="adr">
+                    {mode === "place"
+                        ? `${item.address?.parcel ?? ""} ${item.title ?? "-"}`
+                        : item.address?.parcel || item.address?.road || "-"}
+                  </span>
+                                        <button
+                                            onClick={() => {
+                                                const lon = parseFloat(item.point?.x);
+                                                const lat = parseFloat(item.point?.y);
 
-                                  if (!isNaN(lon) && !isNaN(lat)) {
-                                        addMovingMarker(lon, lat);
-                                  }
-                                  else {
-                                    alert("위치 정보가 없습니다.");
-                                  }
-                               }}>이동</button>
-
+                                                if (!isNaN(lon) && !isNaN(lat)) {
+                                                    addMovingMarker(lon, lat);
+                                                } else {
+                                                    alert("위치 정보가 없습니다.");
+                                                }
+                                            }}
+                                        >
+                                            이동
+                                        </button>
                                     </li>
                                 ))}
                             </ul>
@@ -162,38 +177,39 @@ const Search = ({ visible }: SearchProps) => {
                             <div className="paging">
                                 {firstPage > 1 && (
                                     <button className="paging-icon" onClick={() => handlePageChange(firstPage - 1)}>
-                                        <img src="/images/paging_start.png" alt="이전" />
+                                        <img src="/images/paging_start.png" alt="이전"/>
                                     </button>
                                 )}
 
-                                {Array.from({ length: lastPage - firstPage + 1 },
-                                    (_, idx) => firstPage + idx).map(
+                                {Array.from({length: lastPage - firstPage + 1}, (_, idx) => firstPage + idx).map(
                                     (page) => (
-
-                                        <button key={page}
+                                        <button
+                                            key={page}
                                             className={page === currentPage ? "page-number active" : "page-number"}
-                                            onClick={() => handlePageChange(page)}>{page}</button>
+                                            onClick={() => handlePageChange(page)}
+                                        >
+                                            {page}
+                                        </button>
                                     )
                                 )}
 
                                 {lastPage < totalPages && (
                                     <button className="paging-icon" onClick={() => handlePageChange(lastPage + 1)}>
-                                        <img src="/images/paging_end.png" alt="다음" />
+                                        <img src="/images/paging_end.png" alt="다음"/>
                                     </button>
                                 )}
                             </div>
-                        </>
+                        </div>
                     )}
                 </>
             )}
 
             {searchType === "parcel" && (
                 <div className="parcel_placeholder">
-                    <Region />
+                    <Region/>
                 </div>
             )}
         </div>
     );
 };
-
 export default Search;

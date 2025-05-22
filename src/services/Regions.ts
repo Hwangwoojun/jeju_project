@@ -1,7 +1,6 @@
 // 데이터 콜백 타입 정의
 type Callback = (data: any) => void;
 
-// 환경변수에서 API Key와 Domain을 가져옴
 const API_KEY = import.meta.env.VITE_VWORLD_API_KEY;
 const DOMAIN = import.meta.env.VITE_DOMAIN;
 
@@ -12,13 +11,13 @@ const DOMAIN = import.meta.env.VITE_DOMAIN;
  */
 function loadJSONP(url: string, callback: Callback) {
     const callbackName = `jsonp_callback_${Math.round(100000 * Math.random())}`;
-    const script = document.createElement("script"); // 반드시 먼저 선언되어야 함
+    const script = document.createElement("script");
 
     // 전역 콜백 함수 등록
     (window as any)[callbackName] = function (data: any) {
         callback(data); // 응답 처리
-        delete (window as any)[callbackName]; // 전역 함수 제거 (메모리 누수 방지)
-        document.body.removeChild(script); // script 태그 제거
+        delete (window as any)[callbackName];
+        document.body.removeChild(script);
     };
 
     // JSONP URL 구성 (callback 파라미터 포함)
@@ -36,7 +35,6 @@ export const sidoNames = [
     "제주특별자치도", "강원특별자치도"
 ];
 
-// 단일 시도 요청 함수만 제공
 export function fetchSidoItem(name: string, callback: Callback) {
     const url = `https://api.vworld.kr/req/data?service=data&request=GetFeature&data=LT_C_ADSIDO_INFO&format=json&type=jsonp&key=${API_KEY}&domain=${DOMAIN}&attrFilter=ctp_kor_nm:like:${encodeURIComponent(name)}`;
     loadJSONP(url, callback);

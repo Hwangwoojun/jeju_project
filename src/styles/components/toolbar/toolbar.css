@@ -90,11 +90,11 @@
 }
 
 .my_location_button {
-    position: absolute;
-    right: 100px;
-    top: 111px;
-    width: 36px;
-    height: 36px;
+    position: relative;
+    top: 40px;
+    left: 15px;
+    width: 42px;
+    height: 42px;
     z-index: 2;
     background-color: white;
     border: 1px solid #a1a1a1;

@@ -105,7 +105,7 @@ export function locateMe() {
                     image: new Icon({
                         src: myLocationImg,
                         anchor: [0.5, 1],
-                        scale: 0.1,
+                        scale: 0.075,
                     }),
                 })
             );

@@ -7,9 +7,11 @@
     position: relative;
     overflow: hidden;
 }
+
 .sidebar.open {
     width: 500px;
 }
+
 .sidebar.closed {
     width: 100px;
 }

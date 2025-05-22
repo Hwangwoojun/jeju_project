@@ -1,6 +1,6 @@
 import { useState} from "react";
 import "../../styles/components/toolbar/toolbar.css";
-import { changeMapType, measure } from "../../services/MapEvents";
+import { changeMapType, measure, locateMe } from "../../services/MapEvents";
 
 const Toolbar = () => {
     const [mapType, setMapType] = useState<"일반" | "위성">("일반");
@@ -10,7 +10,12 @@ const MapTypeChange = (type: "일반" | "위성") => {
         changeMapType(type);
     };
 
+const Geolocation = () => {
+  locateMe();
+};
+
     return (
+        <>
         <div className="toolbar">
             <ul className="toolbar_button">
                 <li><img src="/images/ico_layer01.png" className="img_tool" alt="거리측정" title="거리측정"
@@ -32,7 +37,14 @@ const MapTypeChange = (type: "일반" | "위성") => {
                 <button id="Satellite" className={mapType === "위성" ? "active" : ""}
                         onClick={() => MapTypeChange("위성")}>위성</button>
             </div>
+
+
         </div>
+            <button className="my_location_button" title="접속위치" onClick={Geolocation}>
+                <img src="/images/my_location.png" alt="내 위치" />
+            </button>
+        </>
+
     );
 };
 

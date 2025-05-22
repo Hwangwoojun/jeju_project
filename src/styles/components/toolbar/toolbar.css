@@ -88,3 +88,22 @@
 .ol-zoom-out:active {
     background-color: #f2f2f2;
 }
+
+.my_location_button {
+    position: absolute;
+    right: 100px;
+    top: 111px;
+    width: 36px;
+    height: 36px;
+    z-index: 2;
+    background-color: white;
+    border: 1px solid #a1a1a1;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.my_location_button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}

@@ -57,7 +57,9 @@ export function getSigunguList(sidoName: string, callback: Callback) {
  * @param sigungu - 예: '광진구'
  */
 export function getEmdList(sido: string, sigungu: string, callback: Callback) {
-    const fullAddress = `${sido} ${sigungu}`; // 예: 서울특별시 강남구
-    const url = `https://api.vworld.kr/req/data?service=data&request=GetFeature&data=LT_C_ADEMD_INFO&format=json&type=jsonp&key=${API_KEY}&domain=${DOMAIN}&paging=Y&page1&size=100&attrFilter=full_nm:like:${encodeURIComponent(fullAddress)}`;
+
+    const fullAddress = (sido === "세종특별자치시") ? sido : `${sido} ${sigungu}`;
+
+    const url = `https://api.vworld.kr/req/data?service=data&request=GetFeature&data=LT_C_ADEMD_INFO&format=json&type=jsonp&key=${API_KEY}&domain=${DOMAIN}&paging=Y&page=1&size=100&attrFilter=full_nm:like:${encodeURIComponent(fullAddress)}`;
     loadJSONP(url, callback);
 }

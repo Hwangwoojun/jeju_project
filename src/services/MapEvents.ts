@@ -1,14 +1,16 @@
-import { vworldMap, vworldBase, vworldSatellite } from "./VworldApis";
-import { ScaleLine } from "ol/control";
 import Draw from "ol/interaction/Draw";
 import VectorSource from "ol/source/Vector";
 import VectorLayer from "ol/layer/Vector";
+import Overlay from "ol/Overlay";
+import Feature from "ol/Feature";
+import Geolocation from "ol/Geolocation";
+import { vworldMap, vworldBase, vworldSatellite } from "./VworldApis";
+import { ScaleLine } from "ol/control";
 import { Style, Stroke, Fill, Icon } from "ol/style";
 import { LineString, Polygon, Geometry, Point } from "ol/geom";
 import { getLength as getLineLength, getArea as getPolygonArea } from "ol/sphere";
-import Overlay from "ol/Overlay";
-import Feature from "ol/Feature";
 import { fromLonLat } from "ol/proj";
+import {easeOut} from "ol/easing";
 import "../styles/services/MapEnvents.css";
 
 // OpenLayers 관련 코드 모음
@@ -39,7 +41,8 @@ const markerLayer = new VectorLayer({
     zIndex: 4,
 });
 
-const markerImageUrl = "/images/point2.png";
+const markerImg = "/images/point2.png";
+const myLocationImg = "/images/my_location_marker.png";
 
 export function initMarkerLayer() {
     if (!vworldMap.getLayers().getArray().includes(markerLayer)) {
@@ -61,7 +64,7 @@ export function addMovingMarker(lon: number, lat: number) {
     marker.setStyle(
         new Style({
             image: new Icon({
-                src: markerImageUrl,
+                src: markerImg,
                 anchor: [0.5, 1],
                 scale: 1,
             }),
@@ -70,8 +73,61 @@ export function addMovingMarker(lon: number, lat: number) {
 
     markerSource.addFeature(marker);
 
-    vworldMap.getView().setCenter(coord);
-    vworldMap.getView().setZoom(18);
+    vworldMap.getView().animate({
+        center: coord,
+        zoom: 17,
+        duration: 600,
+        easing: easeOut,
+    });
+}
+
+export function locateMe() {
+    const geolocation = new Geolocation({
+        projection: vworldMap.getView().getProjection(),
+        trackingOptions: {
+            enableHighAccuracy: true,
+            timeout: 1000,
+            maximumAge: 0,
+        },
+    });
+    geolocation.setTracking(true);
+
+    geolocation.once("change:position", () => {
+        const position = geolocation.getPosition();
+        if(position) {
+            markerSource.clear();
+            const marker = new Feature({
+                geometry: new Point(position)
+            });
+
+            marker.setStyle(
+                new Style({
+                    image: new Icon({
+                        src: myLocationImg,
+                        anchor: [0.5, 1],
+                        scale: 0.1,
+                    }),
+                })
+            );
+            markerSource.addFeature(marker);
+
+            vworldMap.getView().animate({
+                center: position,
+                zoom: 17,
+                duration: 600,
+                easing: easeOut,
+            });
+        }
+        else {
+            alert("위치 정보를 가져올 수 없습니다");
+        }
+        geolocation.setTracking(false);
+    });
+
+    geolocation.once("error", () => {
+        alert("위치 정보를 가져오는 중 오류가 발생했습니다.");
+         geolocation.setTracking(false);
+    });
 }
 
 export function setupMap(targetElement: HTMLElement | null) {

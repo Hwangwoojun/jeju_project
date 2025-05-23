@@ -2,7 +2,11 @@ import { useState} from "react";
 import "../../styles/components/toolbar/toolbar.css";
 import { changeMapType, measure, locateMe } from "../../services/MapEvents";
 
-const Toolbar = () => {
+type toolbarProps = {
+    onSplitToggle: () => void;
+};
+
+const Toolbar = ({ onSplitToggle }: toolbarProps) => {
     const [mapType, setMapType] = useState<"일반" | "위성">("일반");
 
 const MapTypeChange = (type: "일반" | "위성") => {
@@ -28,7 +32,8 @@ const Geolocation = () => {
                          onClick={() => measure("clear")} /></li>
 
                 <li><img src="/images/ico_layer04.png" className="img_tool" alt="인쇄" title="인쇄" /></li>
-                <li><img src="/images/ico_layer06.png" className="img_tool" alt="화면분활" title="화면분활" /></li>
+                <li><img src="/images/ico_layer06.png" className="img_tool" alt="화면분활" title="화면분활"
+                         onClick={onSplitToggle}/></li>
             </ul>
             <div className="toolbar_map">
                 <button id="base" className={mapType === "일반" ? "active" : ""}

@@ -76,7 +76,7 @@ export function addMovingMarker(lon: number, lat: number) {
     vworldMap.getView().animate({
         center: coord,
         zoom: 17,
-        duration: 600,
+        duration: 900,
         easing: easeOut,
     });
 }
@@ -114,7 +114,7 @@ export function locateMe() {
             vworldMap.getView().animate({
                 center: position,
                 zoom: 17,
-                duration: 600,
+                duration: 900,
                 easing: easeOut,
             });
         }
@@ -270,7 +270,7 @@ function pointerMoveHandler(evt: any) {
     if(geom instanceof Polygon) {
         output = formatArea(geom);
         tooltipCoord = geom.getInteriorPoint().getCoordinates();
-    } 
+    }
     else if (geom instanceof LineString) {
         output = formatLength(geom);
         tooltipCoord = geom.getLastCoordinate();

@@ -35,7 +35,7 @@ const Main = () => {
     return (
         <div className="Main">
             <Sidebar />
-            <Toolbar onSplitToggle={() => setIsSplit(prev => !prev)} />
+            <Toolbar onSplitToggle={() => setIsSplit(prev => !prev)} isSplitMode={isSplit} />
             <Legend />
 
             {isSplit ? (

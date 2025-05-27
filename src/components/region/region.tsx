@@ -141,21 +141,21 @@ export const RegionSearch = () => {
                 <p className="area_search">지역</p>
                 <div className="region_area">
                     <select value={selectedSido} onChange={SideChange}>
-                        <option value="">시/도 선택</option>
+                        <option value="">광역시·도</option>
                         {sidoList.map((sido) => (
                             <option key={sido.code} value={sido.code}>{sido.name}</option>
                         ))}
                     </select>
 
                     <select value={selectedSigungu} onChange={(e) => setSelectedSigungu(e.target.value)}>
-                        <option value="">시/군/구 선택</option>
+                        <option value="">시·군·구</option>
                         {sigunguList.map((sig) => (
                             <option key={sig.code} value={sig.code}>{sig.name}</option>
                         ))}
                     </select>
 
                     <select value={selectedEmd} onChange={(e) => setSelectedEmd(e.target.value)}>
-                        <option value="">읍면동 선택</option>
+                        <option value="">읍·면·동</option>
                         {emdList.map((emd) => (
                             <option key={emd.code} value={emd.code}>{emd.name}</option>
                         ))}
@@ -170,9 +170,7 @@ export const RegionSearch = () => {
                            onChange={(e) => setBubun(e.target.value)} />
                 </div>
 
-                <button className="region_jibun_button" onClick={() => handleSearch(true)}>
-                    검색
-                </button>
+                <button className="region_jibun_button" onClick={() => handleSearch(true)}>검색</button>
             </div>
 
             <div className="region_result">

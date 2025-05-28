@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { sidoNames, fetchSidoItem, getSigunguList, getEmdList } from "../../services/Regions.ts";
 import { searchAddress } from "../../services/Searchs.ts";
 import { addMovingMarker } from "../../services/MapEvents";
+import Map from "ol/Map";
 import "../../styles/components/regiosn/region.css";
 
 interface RegionOption {
@@ -9,7 +10,11 @@ interface RegionOption {
     name: string;
 }
 
-export const RegionSearch = () => {
+interface RegionSearchProps {
+    map: Map;
+}
+
+export const RegionSearch = ({ map }: RegionSearchProps) => {
     const [sidoList, setSidoList] = useState<RegionOption[]>([]);
     const [sigunguList, setSigunguList] = useState<RegionOption[]>([]);
     const [emdList, setEmdList] = useState<RegionOption[]>([]);
@@ -40,23 +45,30 @@ export const RegionSearch = () => {
         sidoNames.forEach((name) => {
             fetchSidoItem(name, (res) => {
                 const features = res?.response?.result?.featureCollection?.features;
-                if(features?.length) {
-                    const parsed = features.map((f: any) => ({
+                if (features?.length) {
+                    const parsed: RegionOption[] = features.map((f: any) => ({
                         code: f.properties.ctprvn_cd,
                         name: f.properties.ctp_kor_nm,
                     }));
-                    collected = [...collected, ...parsed];
+                    collected = collected.concat(parsed);
                 }
+
                 completed++;
-                if(completed === sidoNames.length) {
-                    const deduped =
-                        Array.from(new Map(collected.map((s) => [s.code, s])).values())
-                            .sort((a, b) => a.name.localeCompare(b.name));
+                if (completed === sidoNames.length) {
+
+                    const deduped: RegionOption[] = collected
+                        .reduce<RegionOption[]>((acc, cur) => {
+                            if (!acc.find((item) => item.code === cur.code)) {
+                                acc.push(cur);
+                            }
+                            return acc;
+                        }, [])
+                        .sort((a, b) => a.name.localeCompare(b.name, "ko"));
 
                     setSidoList(deduped);
                 }
-            })
-        })
+            });
+        });
     }, []);
 
     useEffect(() => {
@@ -70,7 +82,7 @@ export const RegionSearch = () => {
                 code: f.properties.sig_cd,
                 name: f.properties.sig_kor_nm,
             }))
-            .sort((a: RegionOption, b: RegionOption) => a.name.localeCompare(b.name, "ko"));
+                .sort((a: RegionOption, b: RegionOption) => a.name.localeCompare(b.name, "ko"));
 
             setSigunguList(parsed);
         });
@@ -83,14 +95,13 @@ export const RegionSearch = () => {
         const sigunguName = sigunguList.find((s) => s.code === selectedSigungu)?.name;
         if (!sidoName || !sigunguName) return;
 
-        // 시도명 + 시군구명을 함께 넘겨서 full_nm 필터로 요청
         getEmdList(sidoName, sigunguName, (res) => {
             const features = res?.response?.result?.featureCollection?.features;
             const parsed = (features ?? []).map((f: any) => ({
                 code: f.properties.emd_cd,
                 name: f.properties.emd_kor_nm,
             }))
-            .sort((a: RegionOption, b: RegionOption) => a.name.localeCompare(b.name, "ko"));
+                .sort((a: RegionOption, b: RegionOption) => a.name.localeCompare(b.name, "ko"));
 
             setEmdList(parsed);
         });
@@ -193,7 +204,7 @@ export const RegionSearch = () => {
                                         const lon = parseFloat(item?.point?.x);
                                         const lat = parseFloat(item?.point?.y);
                                         if (!isNaN(lon) && !isNaN(lat)) {
-                                            addMovingMarker(lon, lat);
+                                            addMovingMarker(map, lon, lat);
                                         } else {
                                             alert("위치 정보가 없습니다.");
                                         }
@@ -226,7 +237,6 @@ export const RegionSearch = () => {
                                 </button>
                             )}
                         </div>
-
                     </>
                 )}
             </div>

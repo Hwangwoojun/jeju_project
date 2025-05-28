@@ -1,20 +1,21 @@
+import { ScaleLine } from "ol/control";
+import { baseLayer, satelliteLayer } from "./VworldApis.ts";
+import { Style, Stroke, Fill, Icon } from "ol/style";
+import { LineString, Polygon, Geometry, Point } from "ol/geom";
+import { getLength as getLineLength, getArea as getPolygonArea } from "ol/sphere";
+import { fromLonLat } from "ol/proj";
+import { easeOut } from "ol/easing";
 import Draw from "ol/interaction/Draw";
 import VectorSource from "ol/source/Vector";
 import VectorLayer from "ol/layer/Vector";
 import Overlay from "ol/Overlay";
 import Feature from "ol/Feature";
 import Geolocation from "ol/Geolocation";
-import { vworldMap, vworldBase, vworldSatellite } from "./VworldApis";
-import { ScaleLine } from "ol/control";
-import { Style, Stroke, Fill, Icon } from "ol/style";
-import { LineString, Polygon, Geometry, Point } from "ol/geom";
-import { getLength as getLineLength, getArea as getPolygonArea } from "ol/sphere";
-import { fromLonLat } from "ol/proj";
-import {easeOut} from "ol/easing";
+import Map from "ol/Map";
+import View from "ol/View";
 import "../styles/services/MapEnvents.css";
 
-// OpenLayers 관련 코드 모음
-
+// ------------------------------ 상태 ------------------------------
 const measureState = {
     draw: null as Draw | null,
     tooltip: null as HTMLElement | null,
@@ -25,7 +26,6 @@ const measureState = {
 };
 
 const measureSource = new VectorSource();
-
 const measureLayer = new VectorLayer({
     source: measureSource,
     style: new Style({
@@ -44,36 +44,31 @@ const markerLayer = new VectorLayer({
 const markerImg = "/images/point2.png";
 const myLocationImg = "/images/my_location_marker.png";
 
-export function initMarkerLayer() {
-    if (!vworldMap.getLayers().getArray().includes(markerLayer)) {
-        vworldMap.addLayer(markerLayer);
+// ------------------------------ 레이어 초기화 ------------------------------
+export function initMarkerLayer(map: Map) {
+    if (!map.getLayers().getArray().includes(markerLayer)) {
+        map.addLayer(markerLayer);
     }
 }
 
-export function addMovingMarker(lon: number, lat: number) {
-    // 기존 마커 삭제
+// ------------------------------ 마커 추가 ------------------------------
+export function addMovingMarker(map: Map, lon: number, lat: number) {
     markerSource.clear();
 
-    // 경도/위도 → OpenLayers 내부 좌표계로 변환
     const coord = fromLonLat([lon, lat]);
+    const marker = new Feature({ geometry: new Point(coord) });
 
-    const marker = new Feature({
-        geometry: new Point(coord),
-    });
-
-    marker.setStyle(
-        new Style({
-            image: new Icon({
-                src: markerImg,
-                anchor: [0.5, 1],
-                scale: 1,
-            }),
-        })
-    );
+    marker.setStyle(new Style({
+        image: new Icon({
+            src: markerImg,
+            anchor: [0.5, 1],
+            scale: 1,
+        }),
+    }));
 
     markerSource.addFeature(marker);
 
-    vworldMap.getView().animate({
+    map.getView().animate({
         center: coord,
         zoom: 17,
         duration: 900,
@@ -81,44 +76,42 @@ export function addMovingMarker(lon: number, lat: number) {
     });
 }
 
-export function locateMe() {
+// ------------------------------ 내 위치 ------------------------------
+export function locateMe(map: Map) {
     const geolocation = new Geolocation({
-        projection: vworldMap.getView().getProjection(),
+        projection: map.getView().getProjection(),
         trackingOptions: {
             enableHighAccuracy: true,
             timeout: 1000,
             maximumAge: 0,
         },
     });
+
     geolocation.setTracking(true);
 
     geolocation.once("change:position", () => {
         const position = geolocation.getPosition();
-        if(position) {
+        if (position) {
             markerSource.clear();
-            const marker = new Feature({
-                geometry: new Point(position)
-            });
 
-            marker.setStyle(
-                new Style({
-                    image: new Icon({
-                        src: myLocationImg,
-                        anchor: [0.5, 1],
-                        scale: 0.075,
-                    }),
-                })
-            );
+            const marker = new Feature({ geometry: new Point(position) });
+            marker.setStyle(new Style({
+                image: new Icon({
+                    src: myLocationImg,
+                    anchor: [0.5, 1],
+                    scale: 0.075,
+                }),
+            }));
+
             markerSource.addFeature(marker);
 
-            vworldMap.getView().animate({
+            map.getView().animate({
                 center: position,
                 zoom: 17,
                 duration: 900,
                 easing: easeOut,
             });
-        }
-        else {
+        } else {
             alert("위치 정보를 가져올 수 없습니다");
         }
         geolocation.setTracking(false);
@@ -126,48 +119,51 @@ export function locateMe() {
 
     geolocation.once("error", () => {
         alert("위치 정보를 가져오는 중 오류가 발생했습니다.");
-         geolocation.setTracking(false);
+        geolocation.setTracking(false);
     });
 }
 
-export function setupMap(targetElement: HTMLElement | null) {
-    if (targetElement) {
-        vworldMap.setTarget(targetElement);
+// ------------------------------ 지도 초기화 ------------------------------
+export function setupMap(targetElement: HTMLElement | null): Map | null {
+    if (!targetElement) return null;
 
-        const scaleControl = new ScaleLine({
-            units: "metric",
-            bar: false,
-            text: true,
-            minWidth: 60,
-        });
-        vworldMap.addControl(scaleControl);
+    const map = new Map({
+        target: targetElement,
+        layers: [baseLayer],
+        view: new View({
+            projection: "EPSG:3857",
+            center: fromLonLat([126.9780, 37.5665]),
+            zoom: 8,
+        }),
+    });
 
-        if (!vworldMap.getLayers().getArray().includes(measureLayer)) {
-            vworldMap.addLayer(measureLayer);
+    const scaleControl = new ScaleLine({
+        units: "metric",
+        bar: false,
+        text: true,
+        minWidth: 60,
+    });
+    map.addControl(scaleControl);
 
-            initMarkerLayer();
-        }
-    } else {
-        vworldMap.setTarget(undefined);
-    }
+    map.addLayer(measureLayer);
+    initMarkerLayer(map);
+
+    return map;
 }
 
-export function changeMapType(type: "일반" | "위성") {
-    vworldMap.getLayers().clear();
-    vworldMap.addLayer(type === "위성" ? vworldSatellite : vworldBase);
+// ------------------------------ 지도 유형 변경 ------------------------------
+export function changeMapType(map: Map, type: "일반" | "위성") {
+    map.getLayers().clear(); // 모든 레이어 제거
 
-    if (!vworldMap.getLayers().getArray().includes(measureLayer)) {
-        vworldMap.addLayer(measureLayer);
-    }
+    map.addLayer(type === "위성" ? satelliteLayer : baseLayer);
 
-    if (!vworldMap.getLayers().getArray().includes(markerLayer)) {
-        vworldMap.addLayer(markerLayer);
-    }
+    map.addLayer(measureLayer);
+    map.addLayer(markerLayer);
 }
 
-export function measure(type: "distance" | "area" | "clear") {
-    clearMeasure();
-
+// ------------------------------ 측정 ------------------------------
+export function measure(map: Map, type: "distance" | "area" | "clear") {
+    clearMeasure(map);
     if (type === "clear") return;
 
     measureState.draw = new Draw({
@@ -175,24 +171,20 @@ export function measure(type: "distance" | "area" | "clear") {
         type: type === "distance" ? "LineString" : "Polygon",
     });
 
-    vworldMap.addInteraction(measureState.draw);
+    map.addInteraction(measureState.draw);
 
     measureState.draw.on("drawstart", (evt) => {
         measureState.sketch = evt.feature;
-        createHelpTooltip();
+        createHelpTooltip(map);
 
         const geom = evt.feature.getGeometry();
-
-
         geom?.on("change", () => {
-            let output = "";
-            let coord;
-
+            let output = "", coord;
             if (geom instanceof Polygon) {
-                output = formatArea(geom);
+                output = formatArea(map, geom);
                 coord = geom.getInteriorPoint().getCoordinates();
             } else if (geom instanceof LineString) {
-                output = formatLength(geom);
+                output = formatLength(map, geom);
                 coord = geom.getLastCoordinate();
             }
 
@@ -202,28 +194,22 @@ export function measure(type: "distance" | "area" | "clear") {
     });
 
     measureState.draw.on("drawend", (evt) => {
-        vworldMap.un("pointermove", pointerMoveHandler);
-
         const geom = evt.feature.getGeometry()?.clone();
         const feature = evt.feature;
 
-        let output = "";
-        let coord;
-
+        let output = "", coord;
         if (geom instanceof Polygon) {
-            output = formatArea(geom);
+            output = formatArea(map, geom);
             coord = geom.getInteriorPoint().getCoordinates();
         } else if (geom instanceof LineString) {
-            output = formatLength(geom);
+            output = formatLength(map, geom);
             coord = geom.getLastCoordinate();
         }
 
         const finalTooltip = document.createElement("div");
         finalTooltip.className = "tooltip tooltip-static";
-
         const valueSpan = document.createElement("span");
         valueSpan.textContent = output;
-
         const closeBtn = document.createElement("span");
         closeBtn.className = "tooltip-close";
         closeBtn.textContent = "X";
@@ -238,19 +224,19 @@ export function measure(type: "distance" | "area" | "clear") {
         });
 
         finalOverlay.setPosition(coord);
-        vworldMap.addOverlay(finalOverlay);
+        map.addOverlay(finalOverlay);
         measureState.finalOverlays.push(finalOverlay);
 
         closeBtn.addEventListener("click", () => {
-           vworldMap.removeOverlay(finalOverlay);
-           measureSource.removeFeature(feature);
+            map.removeOverlay(finalOverlay);
+            measureSource.removeFeature(feature);
         });
 
         if (measureState.tooltip?.parentNode) {
             measureState.tooltip.parentNode.removeChild(measureState.tooltip);
         }
         if (measureState.overlay) {
-            vworldMap.removeOverlay(measureState.overlay);
+            map.removeOverlay(measureState.overlay);
         }
 
         measureState.tooltip = null;
@@ -260,33 +246,12 @@ export function measure(type: "distance" | "area" | "clear") {
     });
 }
 
-function pointerMoveHandler(evt: any) {
-    if(!measureState.sketch || !measureState.tooltip || !measureState.overlay) return;
-
-    const geom = measureState.sketch.getGeometry();
-    let output = "";
-    let tooltipCoord;
-
-    if(geom instanceof Polygon) {
-        output = formatArea(geom);
-        tooltipCoord = geom.getInteriorPoint().getCoordinates();
-    }
-    else if (geom instanceof LineString) {
-        output = formatLength(geom);
-        tooltipCoord = geom.getLastCoordinate();
-    }
-
-    measureState.lastPointerCoord = evt.coordinate;
-    measureState.tooltip.innerHTML = output;
-    measureState.overlay.setPosition(tooltipCoord);
-}
-
-function createHelpTooltip() {
-    if(measureState.tooltip?.parentNode) {
+function createHelpTooltip(map: Map) {
+    if (measureState.tooltip?.parentNode) {
         measureState.tooltip.parentNode.removeChild(measureState.tooltip);
     }
-    if(measureState.overlay) {
-        vworldMap.removeOverlay(measureState.overlay);
+    if (measureState.overlay) {
+        map.removeOverlay(measureState.overlay);
     }
 
     measureState.tooltip = document.createElement("div");
@@ -296,37 +261,37 @@ function createHelpTooltip() {
         offset: [0, -10],
         positioning: "bottom-center",
     });
-    vworldMap.addOverlay(measureState.overlay);
+    map.addOverlay(measureState.overlay);
 }
 
-function formatLength(line: LineString): string {
-    const length = getLineLength(line, { projection: vworldMap.getView().getProjection() });
+function formatLength(map: Map, line: LineString): string {
+    const length = getLineLength(line, { projection: map.getView().getProjection() });
     return length > 100 ? `${(length / 1000).toFixed(2)} km` : `${length.toFixed(1)} m`;
 }
 
-function formatArea(polygon: Polygon): string {
-    const area = getPolygonArea(polygon, { projection: vworldMap.getView().getProjection() });
+function formatArea(map: Map, polygon: Polygon): string {
+    const area = getPolygonArea(polygon, { projection: map.getView().getProjection() });
     return area > 10000 ? `${(area / 1000000).toFixed(2)} km²` : `${area.toFixed(1)} m²`;
 }
 
-export function clearMeasure() {
+export function clearMeasure(map: Map) {
     measureSource.clear();
     if (measureState.draw) {
-        vworldMap.removeInteraction(measureState.draw);
+        map.removeInteraction(measureState.draw);
         measureState.draw = null;
     }
 
     if (measureState.overlay) {
-        vworldMap.removeOverlay(measureState.overlay);
+        map.removeOverlay(measureState.overlay);
         measureState.overlay = null;
     }
 
-    if(measureState.tooltip?.parentNode) {
+    if (measureState.tooltip?.parentNode) {
         measureState.tooltip.parentNode.removeChild(measureState.tooltip);
         measureState.tooltip = null;
     }
 
-    measureState.finalOverlays.forEach((overlay) => vworldMap.removeOverlay(overlay));
+    measureState.finalOverlays.forEach((overlay) => map.removeOverlay(overlay));
     measureState.finalOverlays = [];
     measureState.sketch = null;
     measureState.lastPointerCoord = null;

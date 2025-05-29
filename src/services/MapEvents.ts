@@ -5,6 +5,7 @@ import Overlay from "ol/Overlay";
 import Feature from "ol/Feature";
 import Geolocation from "ol/Geolocation";
 import { vworldMap, vworldBase, vworldSatellite } from "./VworldApis";
+import { egisEcoLayer } from "./LayerServices.ts";
 import { ScaleLine } from "ol/control";
 import { Style, Stroke, Fill, Icon } from "ol/style";
 import { LineString, Polygon, Geometry, Point } from "ol/geom";
@@ -33,12 +34,12 @@ const measureLayer = new VectorLayer({
         stroke: new Stroke({ color: "#ffcc33", width: 2 }),
     }),
 });
-measureLayer.setZIndex(4);
+measureLayer.setZIndex(15);
 
 const markerSource = new VectorSource();
 const markerLayer = new VectorLayer({
     source: markerSource,
-    zIndex: 4,
+    zIndex: 15,
 });
 
 const markerImg = "/images/point2.png";
@@ -154,6 +155,7 @@ export function setupMap(targetElement: HTMLElement | null) {
 
 export function changeMapType(type: "일반" | "위성") {
     vworldMap.getLayers().clear();
+
     vworldMap.addLayer(type === "위성" ? vworldSatellite : vworldBase);
 
     if (!vworldMap.getLayers().getArray().includes(measureLayer)) {
@@ -162,6 +164,10 @@ export function changeMapType(type: "일반" | "위성") {
 
     if (!vworldMap.getLayers().getArray().includes(markerLayer)) {
         vworldMap.addLayer(markerLayer);
+    }
+
+    if (!vworldMap.getLayers().getArray().includes(egisEcoLayer)) {
+        vworldMap.addLayer(egisEcoLayer);
     }
 }
 

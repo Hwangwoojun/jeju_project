@@ -17,11 +17,11 @@ export const GeoService = {
         const source = new TileWMS({
             url: `http://localhost:8080/geoserver/gwc/service/wms`,
             params: {
-                LAYERS: `${workspace}:${layerName}`, // ex) ethree:env_total
+                LAYERS: `${workspace}:${layerName}`, // ethree:env_total
                 TILED: true,
                 VERSION: "1.1.0",
                 SRS: "EPSG:3857",
-                FORMAT: "image/png", // GeoTIFF → PNG 변환된 이미지로 표현됨
+                FORMAT: "image/png", // GeoTIFF -> PNG 변환된 이미지로 표현됨
                 TRANSPARENT: true,
             },
             serverType: "geoserver",

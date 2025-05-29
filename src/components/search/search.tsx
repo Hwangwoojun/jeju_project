@@ -79,31 +79,31 @@ const Search = ({ visible }: SearchProps) => {
         <div className="search_panel">
             <div className="search_type_toggle">
                 <button className={searchType === "combined" ? "active" : ""}
-                    onClick={() => setSearchType("combined")}>통합검색</button>
+                        onClick={() => setSearchType("combined")}>통합검색</button>
 
                 <button className={searchType === "parcel" ? "active" : ""}
-                    onClick={() => setSearchType("parcel")}>지번검색</button>
+                        onClick={() => setSearchType("parcel")}>지번검색</button>
             </div>
 
             {searchType === "combined" && (
                 <>
                     <div className="search_bar_wrapper">
                         <input type="text" value={keyword}
-                            onChange={(e) => setKeyword(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    setPlacePage(1);
-                                    setAddressPage(1);
-                                    handleSearch();
-                                }
-                            }} placeholder="예) 서울시청, 강남역, 123-45 중앙로 100"/>
+                               onChange={(e) => setKeyword(e.target.value)}
+                               onKeyDown={(e) => {
+                                   if (e.key === "Enter") {
+                                       setPlacePage(1);
+                                       setAddressPage(1);
+                                       handleSearch();
+                                   }
+                               }} placeholder="예) 서울시청, 강남역, 123-45 중앙로 100"/>
 
                         <button className="search_button"
                                 onClick={() => {
-                                setPlacePage(1);
-                                setAddressPage(1);
-                                handleSearch();
-                            }}>검색</button>
+                                    setPlacePage(1);
+                                    setAddressPage(1);
+                                    handleSearch();
+                                }}>검색</button>
                     </div>
 
                     <div className="search_result_info">
@@ -113,10 +113,10 @@ const Search = ({ visible }: SearchProps) => {
 
                     <div className="result_toggle">
                         <button className={mode === "place" ? "active" : ""}
-                            onClick={() => setMode("place")}>장소</button>
+                                onClick={() => setMode("place")}>장소</button>
 
                         <button className={mode === "address" ? "active" : ""}
-                            onClick={() => setMode("address")}>주소</button>
+                                onClick={() => setMode("address")}>주소</button>
                     </div>
 
                     {(mode === "place" ? placeResults : addressResults).length === 0 ? (
@@ -133,18 +133,18 @@ const Search = ({ visible }: SearchProps) => {
                         ? `${item.address?.parcel ?? ""} ${item.title ?? "-"}`
                         : item.address?.parcel || item.address?.road || "-"}
                   </span>
-                          <button onClick={() => {
-                              const lon = parseFloat(item.point?.x);
-                               const lat = parseFloat(item.point?.y);
+                                        <button onClick={() => {
+                                            const lon = parseFloat(item.point?.x);
+                                            const lat = parseFloat(item.point?.y);
 
-                                   if (!isNaN(lon) && !isNaN(lat)) {
-                                        addMovingMarker(lon, lat);
-                                   }
-                                   else {
-                                     alert("위치 정보가 없습니다.");
-                                   }
+                                            if (!isNaN(lon) && !isNaN(lat)) {
+                                                addMovingMarker(lon, lat);
+                                            }
+                                            else {
+                                                alert("위치 정보가 없습니다.");
+                                            }
 
-                                   }}>이동</button>
+                                        }}>이동</button>
                                     </li>
                                 ))}
                             </ul>
@@ -160,8 +160,8 @@ const Search = ({ visible }: SearchProps) => {
                                     (page) => (
 
                                         <button key={page}
-                                            className={page === currentPage ? "page-number active" : "page-number"}
-                                            onClick={() => handlePageChange(page)}>{page}</button>
+                                                className={page === currentPage ? "page-number active" : "page-number"}
+                                                onClick={() => handlePageChange(page)}>{page}</button>
                                     )
                                 )}
 

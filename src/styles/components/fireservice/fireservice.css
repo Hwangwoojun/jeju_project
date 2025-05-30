@@ -45,6 +45,12 @@
     border-top-right-radius: 5px;
 }
 
+.fire_layer_item:last-of-type {
+    border-bottom: 1px solid #ddd;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
 .fire_layer_header {
     display: flex;
     align-items: center;

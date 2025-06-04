@@ -18,7 +18,7 @@ const Sidebar = () => {
 
                 <header className="sidebar_header">
                     <a href="./">
-                        <div className="sidebar_text">text</div>
+                        <div className="sidebar_text">산불·산사태 기후재해 진단 플랫폼 </div>
                     </a>
                     <a href="./">
                         <button className="sidebar_button">홈페이지 바로가기</button>

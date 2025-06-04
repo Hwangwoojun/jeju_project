@@ -26,13 +26,14 @@
 
 .sidebar_header a {
     text-decoration: none;
-    color: black;
+    color: #5e5e5e;
 }
 
 .sidebar_text {
-    width: 232px;
+    width: 270px;
     padding-left: 10px;
-    font-size: 30px;
+    font-size: 18px;
+    font-weight: 500;
 }
 
 .sidebar_button {

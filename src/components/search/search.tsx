@@ -60,6 +60,7 @@ const Search = ({ visible }: SearchProps) => {
         }
     };
 
+    // 만약 검색창에서 장소나 주소를 적고 그 검색창에 검색한 단어를 지우고 페이징 기능을 클릭할 시 알림창 뜸
     const handlePageChange = (page: number) => {
         if (!keyword.trim()) {
             alert("브이월드 서버 점검중입니다.");

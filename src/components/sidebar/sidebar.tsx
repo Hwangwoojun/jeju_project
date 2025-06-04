@@ -18,7 +18,7 @@ const Sidebar = () => {
 
                 <header className="sidebar_header">
                     <a href="./">
-                        <img src="/images/hd_logo.png" alt="로고" className="sidebar_logo" />
+                        <div className="sidebar_text">text</div>
                     </a>
                     <a href="./">
                         <button className="sidebar_button">홈페이지 바로가기</button>

@@ -129,8 +129,8 @@ const Search = ({ visible }: SearchProps) => {
                                 {(mode === "place" ? placeResults : addressResults).map((item, idx) => (
                                     <li className="result_list_item" key={idx}>
                   <span className="adr">
-                    {mode === "place"
-                        ? `${item.address?.parcel ?? ""} ${item.title ?? "-"}`
+                    {mode === "place" ?
+                        `${item.address?.parcel ?? ""} ${item.title ?? "-"}`
                         : item.address?.parcel || item.address?.road || "-"}
                   </span>
                                         <button onClick={() => {

@@ -46,14 +46,16 @@ const Search = ({ visible }: SearchProps) => {
         }
 
         if (searchType === "combined") {
-            // 장소 검색
-            searchCombinedStep(keyword, placePage, dataPerPage).then(({items, total}) => {
+            // 장소 또는 도로명 주소 fallback 검색
+            searchCombinedStep(keyword, placePage, dataPerPage).then(({ items, total }) => {
+                console.log("장소 or 도로명 검색 결과:", items);
                 setPlaceResults(items);
                 setPlaceTotal(total);
             });
 
-            // 주소 검색
-            searchAddress(keyword, "parcel", addressPage, dataPerPage).then(({items, total}) => {
+            // 지번 주소 검색
+            searchAddress(keyword, "parcel", addressPage, dataPerPage).then(({ items, total }) => {
+                console.log("지번 주소 검색 결과:", items);
                 setAddressResults(items);
                 setAddressTotal(total);
             });

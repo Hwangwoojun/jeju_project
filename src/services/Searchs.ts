@@ -91,5 +91,14 @@ export const searchCombinedStep = (
     page: number = 1,
     size: number = 5
 ): Promise<{ items: any[]; total: number }> => {
-    return searchPlace(keyword, page, size);
+    // 1차: PLACE 검색
+    return searchPlace(keyword, page, size).then((placeResult) => {
+        if (placeResult.total > 0) {
+            return placeResult;
+        }
+
+        // 2차: 도로명 주소 fallback만 수행
+        return searchAddress(keyword, "road", page, size);
+    });
 };
+

@@ -13,21 +13,23 @@ const landslideLayerIds = ["landslide_today", "landslide_tomorrow", "landslide_d
 // 전체 LayerId 타입
 type LayerId = typeof fireLayerIds[number] | typeof landslideLayerIds[number];
 
-// 공통 레이어 라벨 설정
-const layerLabels: Record<LayerId, string> = {
-    fire_today: "오늘", fire_tomorrow: "내일", fire_dayAfter: "모레",
-    landslide_today: "오늘", landslide_tomorrow: "내일", landslide_dayAfter: "모레",
-};
-
+// 🔥 부모에서 전달받을 props 타입 정의
 interface FireServiceProps {
     visible: boolean;
-    checkedLayers: Record<LayerId, boolean>;
-    setCheckedLayers: React.Dispatch<React.SetStateAction<Record<LayerId, boolean>>>;
-    opacity: Record<LayerId, number>;
-    setOpacity: React.Dispatch<React.SetStateAction<Record<LayerId, number>>>;
+    toggleFireLayer: (layer: "fire_today" | "fire_tomorrow" | "fire_dayAfter", isActive: boolean) => void;
 }
 
-const FireService = ({ visible }: FireServiceProps) => {
+// 공통 라벨
+const layerLabels: Record<LayerId, string> = {
+    fire_today: "오늘",
+    fire_tomorrow: "내일",
+    fire_dayAfter: "모레",
+    landslide_today: "오늘",
+    landslide_tomorrow: "내일",
+    landslide_dayAfter: "모레",
+};
+
+const FireService = ({ visible, toggleFireLayer }: FireServiceProps) => {
     const [checkedLayers, setCheckedLayers] = useState<Record<LayerId, boolean>>({
         fire_today: true,
         fire_tomorrow: false,
@@ -66,7 +68,7 @@ const FireService = ({ visible }: FireServiceProps) => {
                 }
             } else {
                 if (vworldMap.getLayers().getArray().includes(layer)) {
-                    layer.setVisible(false); // 지도에 남기고 비가시화 처리
+                    layer.setVisible(false);
                 }
             }
         });
@@ -87,15 +89,24 @@ const FireService = ({ visible }: FireServiceProps) => {
         setCheckedLayers((prev) => ({ ...prev, [id]: !prev[id] }));
     };
 
+// 부모로 상태 전달 (렌더링 이후 안전하게)
+    useEffect(() => {
+        fireLayerIds.forEach((id) => {
+            toggleFireLayer(id as "fire_today" | "fire_tomorrow" | "fire_dayAfter", checkedLayers[id]);
+        });
+    }, [checkedLayers]);
+
     const LayerGroup = (group: readonly LayerId[], title: string) => (
         <div className="fire_panel">
             <h3 className="fire_title">{title}</h3>
             {group.map((id) => (
                 <div key={id} className="fire_layer_item">
                     <div className="fire_layer_header">
-
-                        <img src={`/images/chk_type02_${checkedLayers[id] ? "on" : "off"}.png`} alt="check"
-                            className="fire_checkbox" onClick={() => toggleLayerCheck(id)}
+                        <img
+                            src={`/images/chk_type02_${checkedLayers[id] ? "on" : "off"}.png`}
+                            alt="check"
+                            className="fire_checkbox"
+                            onClick={() => toggleLayerCheck(id)}
                         />
                         <span className="fire_layer_label" onClick={() => toggleLayerCheck(id)}>
               {layerLabels[id]}
@@ -103,13 +114,16 @@ const FireService = ({ visible }: FireServiceProps) => {
                         <div className="opacity_box_inline">
                             <span className="opacity_text">{opacity[id]}%</span>
                             <div className="opacity_buttons">
-                                <button className="arrow_btn up"
+                                <button
+                                    className="arrow_btn up"
                                     onClick={() => changeOpacity(id, Math.min(100, opacity[id] + 10))}
-                                    disabled={!checkedLayers[id]}></button>
-
-                                <button className="arrow_btn down"
+                                    disabled={!checkedLayers[id]}
+                                />
+                                <button
+                                    className="arrow_btn down"
                                     onClick={() => changeOpacity(id, Math.max(0, opacity[id] - 10))}
-                                    disabled={!checkedLayers[id]}></button>
+                                    disabled={!checkedLayers[id]}
+                                />
                             </div>
                         </div>
                         <span className="fire_info_icon">
@@ -133,7 +147,7 @@ const FireService = ({ visible }: FireServiceProps) => {
 
 export default FireService;
 
-// 🔧 레이어 ID에 맞는 레이어 객체 반환
+// 레이어 ID에 따른 레이어 객체 반환
 function getLayerById(id: LayerId): TileLayer {
     switch (id) {
         case "fire_today":
@@ -142,8 +156,7 @@ function getLayerById(id: LayerId): TileLayer {
             return fireTomorrowLayer;
         case "fire_dayAfter":
             return fireDayAfterLayer;
-        // 산사태는 아직 연결된 레이어 없음 → 빈 타일로 대체
         default:
-            return new TileLayer();
+            return new TileLayer(); // 산사태는 아직 레이어 없음
     }
 }

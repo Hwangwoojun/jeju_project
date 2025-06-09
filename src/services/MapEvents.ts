@@ -155,8 +155,7 @@ export function setupMap(targetElement: HTMLElement | null) {
 
 export function changeMapType(
     type: "일반" | "위성",
-    checkedLayers: Record<string, boolean>,
-    opacity: Record<string, number>
+    activeFireLayers: ("fire_today" | "fire_tomorrow" | "fire_dayAfter")[]
 ) {
     vworldMap.getLayers().clear();
 
@@ -164,25 +163,22 @@ export function changeMapType(
     vworldMap.addLayer(type === "위성" ? vworldSatellite : vworldBase);
 
     // 공통 기능 레이어 추가
-    vworldMap.addLayer(measureLayer);
-    vworldMap.addLayer(markerLayer);
+    if (!vworldMap.getLayers().getArray().includes(measureLayer)) {
+        vworldMap.addLayer(measureLayer);
+    }
 
-    // 선택된 산불 레이어 유지
-    if (checkedLayers["fire_today"]) {
-        fireTodayLayer.setOpacity(opacity["fire_today"] / 100);
-        fireTodayLayer.setVisible(true);
+    if (!vworldMap.getLayers().getArray().includes(markerLayer)) {
+        vworldMap.addLayer(markerLayer);
+    }
+
+    // 🔥 현재 체크된 산불 레이어만 추가
+    if (activeFireLayers.includes("fire_today")) {
         vworldMap.addLayer(fireTodayLayer);
     }
-
-    if (checkedLayers["fire_tomorrow"]) {
-        fireTomorrowLayer.setOpacity(opacity["fire_tomorrow"] / 100);
-        fireTomorrowLayer.setVisible(true);
+    if (activeFireLayers.includes("fire_tomorrow")) {
         vworldMap.addLayer(fireTomorrowLayer);
     }
-
-    if (checkedLayers["fire_dayAfter"]) {
-        fireDayAfterLayer.setOpacity(opacity["fire_dayAfter"] / 100);
-        fireDayAfterLayer.setVisible(true);
+    if (activeFireLayers.includes("fire_dayAfter")) {
         vworldMap.addLayer(fireDayAfterLayer);
     }
 }

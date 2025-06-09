@@ -167,24 +167,27 @@ export function changeMapType(
     vworldMap.addLayer(measureLayer);
     vworldMap.addLayer(markerLayer);
 
-    // 선택된 산불 레이어 유지
-    if (checkedLayers["fire_today"]) {
-        fireTodayLayer.setOpacity(opacity["fire_today"] / 100);
-        fireTodayLayer.setVisible(true);
-        vworldMap.addLayer(fireTodayLayer);
-    }
+    // 🔁 체크된 레이어만 추가하고, 체크 안된 레이어는 지도에서 제거
+    const layerMap: Record<string, TileLayer> = {
+        fire_today: fireTodayLayer,
+        fire_tomorrow: fireTomorrowLayer,
+        fire_dayAfter: fireDayAfterLayer,
+        // 필요하면 landslide도 추가 가능
+    };
 
-    if (checkedLayers["fire_tomorrow"]) {
-        fireTomorrowLayer.setOpacity(opacity["fire_tomorrow"] / 100);
-        fireTomorrowLayer.setVisible(true);
-        vworldMap.addLayer(fireTomorrowLayer);
-    }
-
-    if (checkedLayers["fire_dayAfter"]) {
-        fireDayAfterLayer.setOpacity(opacity["fire_dayAfter"] / 100);
-        fireDayAfterLayer.setVisible(true);
-        vworldMap.addLayer(fireDayAfterLayer);
-    }
+    Object.keys(layerMap).forEach((key) => {
+        const layer = layerMap[key];
+        if (checkedLayers[key]) {
+            layer.setOpacity(opacity[key] / 100);
+            layer.setVisible(true);
+            vworldMap.addLayer(layer);
+        } else {
+            // 혹시 이미 올라간 게 있다면 제거
+            if (vworldMap.getLayers().getArray().includes(layer)) {
+                vworldMap.removeLayer(layer);
+            }
+        }
+    });
 }
 
 export function measure(type: "distance" | "area" | "clear") {

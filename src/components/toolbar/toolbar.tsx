@@ -2,11 +2,12 @@ import { useState } from "react";
 import { changeMapType, measure, locateMe } from "../../services/MapEvents";
 import "../../styles/components/toolbar/toolbar.css";
 
+// 🔧 props에 추가
 type ToolbarProps = {
     onSplitToggle: () => void;
     isSplitMode: boolean;
-    checkedLayers: Record<string, boolean>; // 🔧 추가
-    opacity: Record<string, number>;        // 🔧 추가
+    checkedLayers: Record<string, boolean>;
+    opacity: Record<string, number>;
 };
 
 const Toolbar = ({ onSplitToggle, isSplitMode, checkedLayers, opacity }: ToolbarProps) => {
@@ -22,7 +23,7 @@ const Toolbar = ({ onSplitToggle, isSplitMode, checkedLayers, opacity }: Toolbar
 
     const MapTypeChange = (type: "일반" | "위성") => {
         setMapType(type);
-        changeMapType(type, checkedLayers, opacity); // 🔧 수정된 부분
+        changeMapType(type, checkedLayers, opacity); // ✅ 수정된 부분
     };
 
     const Geolocation = () => {
@@ -33,67 +34,23 @@ const Toolbar = ({ onSplitToggle, isSplitMode, checkedLayers, opacity }: Toolbar
         <>
             <div className="toolbar">
                 <ul className="toolbar_button">
-                    <li>
-                        <img
-                            src="/images/ico_layer01.png"
-                            className="img_tool"
-                            alt="거리측정"
-                            title="거리측정"
-                            onClick={() => Guards(() => measure("distance"))}
-                        />
-                    </li>
-                    <li>
-                        <img
-                            src="/images/ico_layer02.png"
-                            className="img_tool"
-                            alt="면적측정"
-                            title="면적측정"
-                            onClick={() => Guards(() => measure("area"))}
-                        />
-                    </li>
-                    <li>
-                        <img
-                            src="/images/ico_layer03.png"
-                            className="img_tool"
-                            alt="초기화"
-                            title="초기화"
-                            onClick={() => Guards(() => measure("clear"))}
-                        />
-                    </li>
-                    <li>
-                        <img
-                            src="/images/ico_layer04.png"
-                            className="img_tool"
-                            alt="인쇄"
-                            title="인쇄"
-                            onClick={() => Guards(() => window.print())}
-                        />
-                    </li>
-                    <li>
-                        <img
-                            src="/images/ico_layer06.png"
-                            className="img_tool"
-                            alt="화면분할"
-                            title="화면분할"
-                            onClick={onSplitToggle}
-                        />
-                    </li>
+                    <li><img src="/images/ico_layer01.png" className="img_tool" alt="거리측정" title="거리측정"
+                             onClick={() => Guards(() => measure("distance"))} /></li>
+                    <li><img src="/images/ico_layer02.png" className="img_tool" alt="면적측정" title="면적측정"
+                             onClick={() => Guards(() => measure("area"))} /></li>
+                    <li><img src="/images/ico_layer03.png" className="img_tool" alt="초기화" title="초기화"
+                             onClick={() => Guards(() => measure("clear"))} /></li>
+                    <li><img src="/images/ico_layer04.png" className="img_tool" alt="인쇄" title="인쇄"
+                             onClick={() => Guards(() => window.print())} /></li>
+                    <li><img src="/images/ico_layer06.png" className="img_tool" alt="화면분활" title="화면분활"
+                             onClick={onSplitToggle} /></li>
                 </ul>
                 <div className="toolbar_map">
-                    <button
-                        id="base"
-                        className={mapType === "일반" ? "active" : ""}
-                        onClick={() => MapTypeChange("일반")}
-                    >
-                        일반
-                    </button>
-                    <button
-                        id="Satellite"
-                        className={mapType === "위성" ? "active" : ""}
-                        onClick={() => MapTypeChange("위성")}
-                    >
-                        위성
-                    </button>
+                    <button id="base" className={mapType === "일반" ? "active" : ""}
+                            onClick={() => MapTypeChange("일반")}>일반</button>
+
+                    <button id="Satellite" className={mapType === "위성" ? "active" : ""}
+                            onClick={() => MapTypeChange("위성")}>위성</button>
                 </div>
             </div>
             <button className="my_location_button" title="접속위치" onClick={Geolocation}>

@@ -21,6 +21,10 @@ const layerLabels: Record<LayerId, string> = {
 
 interface FireServiceProps {
     visible: boolean;
+    checkedLayers: Record<LayerId, boolean>;
+    setCheckedLayers: React.Dispatch<React.SetStateAction<Record<LayerId, boolean>>>;
+    opacity: Record<LayerId, number>;
+    setOpacity: React.Dispatch<React.SetStateAction<Record<LayerId, number>>>;
 }
 
 const FireService = ({ visible }: FireServiceProps) => {

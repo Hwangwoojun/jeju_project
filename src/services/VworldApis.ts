@@ -8,7 +8,7 @@ import { fromLonLat } from "ol/proj";
 // 기본 지도
 export const vworldBase = new TileLayer({
     source: new XYZ({
-        url: `https://api.vworld.kr/req/wmts/1.0.0/6F38BA6D-8702-3ED7-824F-306FE0B2C8D0/Base/{z}/{y}/{x}.png`,
+        url: `https://api.vworld.kr/req/wmts/1.0.0/994AECF2-9724-327A-A054-AF9534CAE30B/Base/{z}/{y}/{x}.png`,
     }),
     properties: { name: "base" },
     minZoom: 6,
@@ -20,7 +20,7 @@ export const vworldBase = new TileLayer({
 // 위성 지도
 export const vworldSatellite = new TileLayer({
     source: new XYZ({
-        url: `https://api.vworld.kr/req/wmts/1.0.0/6F38BA6D-8702-3ED7-824F-306FE0B2C8D0/Satellite/{z}/{y}/{x}.jpeg`,
+        url: `https://api.vworld.kr/req/wmts/1.0.0/994AECF2-9724-327A-A054-AF9534CAE30B/Satellite/{z}/{y}/{x}.jpeg`,
     }),
     properties: { name: "satellite" },
     minZoom: 6,

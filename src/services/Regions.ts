@@ -1,8 +1,8 @@
 // 데이터 콜백 타입 정의
 type Callback = (data: any) => void;
 
-const API_KEY = import.meta.env.VITE_VWORLD_API_KEY;
-const DOMAIN = import.meta.env.VITE_DOMAIN;
+// const API_KEY = import.meta.env.VITE_VWORLD_API_KEY;
+// const DOMAIN = import.meta.env.VITE_DOMAIN;
 
 /**
  * JSONP 방식으로 데이터를 요청하는 함수
@@ -36,7 +36,7 @@ export const sidoNames = [
 ];
 
 export function fetchSidoItem(name: string, callback: Callback) {
-    const url = `https://api.vworld.kr/req/data?service=data&request=GetFeature&data=LT_C_ADSIDO_INFO&format=json&type=jsonp&key=${API_KEY}&domain=${DOMAIN}&attrFilter=ctp_kor_nm:like:${encodeURIComponent(name)}`;
+    const url = `https://api.vworld.kr/req/data?service=data&request=GetFeature&data=LT_C_ADSIDO_INFO&format=json&type=jsonp&key=994AECF2-9724-327A-A054-AF9534CAE30B&domain=localhost:8084&attrFilter=ctp_kor_nm:like:${encodeURIComponent(name)}`;
     loadJSONP(url, callback);
 }
 
@@ -45,7 +45,7 @@ export function fetchSidoItem(name: string, callback: Callback) {
  * @param sidoName - 예: '서울특별시'
  */
 export function getSigunguList(sidoName: string, callback: Callback) {
-    const url = `https://api.vworld.kr/req/data?service=data&request=GetFeature&data=LT_C_ADSIGG_INFO&format=json&type=jsonp&key=${API_KEY}&domain=${DOMAIN}&paging=Y&page=1&size=100&attrFilter=full_nm:like:${encodeURIComponent(sidoName)}`;
+    const url = `https://api.vworld.kr/req/data?service=data&request=GetFeature&data=LT_C_ADSIGG_INFO&format=json&type=jsonp&key=994AECF2-9724-327A-A054-AF9534CAE30B&domain=localhost:8084&paging=Y&page=1&size=100&attrFilter=full_nm:like:${encodeURIComponent(sidoName)}`;
     loadJSONP(url, callback);
 }
 
@@ -58,6 +58,6 @@ export function getEmdList(sido: string, sigungu: string, callback: Callback) {
 
     const fullAddress = (sido === "세종특별자치시") ? sido : `${sido} ${sigungu}`;
 
-    const url = `https://api.vworld.kr/req/data?service=data&request=GetFeature&data=LT_C_ADEMD_INFO&format=json&type=jsonp&key=${API_KEY}&domain=${DOMAIN}&paging=Y&page=1&size=100&attrFilter=full_nm:like:${encodeURIComponent(fullAddress)}`;
+    const url = `https://api.vworld.kr/req/data?service=data&request=GetFeature&data=LT_C_ADEMD_INFO&format=json&type=jsonp&key=994AECF2-9724-327A-A054-AF9534CAE30B&domain=localhost:8084&paging=Y&page=1&size=100&attrFilter=full_nm:like:${encodeURIComponent(fullAddress)}`;
     loadJSONP(url, callback);
 }

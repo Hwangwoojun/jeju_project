@@ -34,7 +34,7 @@ export const vworldMap = new Map ({
     layers: [vworldBase],
     view: new View({
         projection: "EPSG:3857",
-        center: fromLonLat([126.9780, 37.5665]),
+        center: fromLonLat([127.1, 36.2]),
         zoom: 8,
         minZoom: 7,
         maxZoom: 20,

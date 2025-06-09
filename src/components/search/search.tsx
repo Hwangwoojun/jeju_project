@@ -62,7 +62,6 @@ const Search = ({ visible }: SearchProps) => {
         }
     };
 
-    // 만약 검색창에서 장소나 주소를 적고 그 검색창에 검색한 단어를 지우고 페이징 기능을 클릭할 시 알림창 뜸
     const handlePageChange = (page: number) => {
         if (!keyword.trim()) {
             alert("브이월드 서버 점검중입니다.");
@@ -131,22 +130,20 @@ const Search = ({ visible }: SearchProps) => {
                             <ul className="result_list">
                                 {(mode === "place" ? placeResults : addressResults).map((item, idx) => (
                                     <li className="result_list_item" key={idx}>
-                  <span className="adr">
-                    {mode === "place" ?
-                        `${item.address?.parcel ?? ""} ${item.title ?? "-"}`
-                        : item.address?.parcel || item.address?.road || "-"}
-                  </span>
+                                        <span className="adr">
+                                            {mode === "place"
+                                                ? `${item.title ?? "-"} / ${item.address?.road ?? ""} / ${item.address?.parcel ?? ""}`
+                                                : item.address?.road ?? item.address?.parcel ?? "-"}
+                                        </span>
                                         <button onClick={() => {
                                             const lon = parseFloat(item.point?.x);
                                             const lat = parseFloat(item.point?.y);
 
                                             if (!isNaN(lon) && !isNaN(lat)) {
                                                 addMovingMarker(lon, lat);
-                                            }
-                                            else {
+                                            } else {
                                                 alert("위치 정보가 없습니다.");
                                             }
-
                                         }}>이동</button>
                                     </li>
                                 ))}
@@ -159,9 +156,8 @@ const Search = ({ visible }: SearchProps) => {
                                     </button>
                                 )}
 
-                                {Array.from({length: lastPage - firstPage + 1}, (_, idx) => firstPage + idx).map(
+                                {Array.from({ length: lastPage - firstPage + 1 }, (_, idx) => firstPage + idx).map(
                                     (page) => (
-
                                         <button key={page}
                                                 className={page === currentPage ? "page-number active" : "page-number"}
                                                 onClick={() => handlePageChange(page)}>{page}</button>
@@ -187,4 +183,5 @@ const Search = ({ visible }: SearchProps) => {
         </div>
     );
 };
+
 export default Search;

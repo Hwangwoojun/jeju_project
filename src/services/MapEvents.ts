@@ -5,7 +5,7 @@ import Overlay from "ol/Overlay";
 import Feature from "ol/Feature";
 import Geolocation from "ol/Geolocation";
 import { vworldMap, vworldBase, vworldSatellite } from "./VworldApis";
-import { egisEcoLayer } from "./LayerServices.ts";
+import { fireTodayLayer, fireTomorrowLayer, fireDayAfterLayer } from "./LayerServices.ts";
 import { ScaleLine } from "ol/control";
 import { Style, Stroke, Fill, Icon } from "ol/style";
 import { LineString, Polygon, Geometry, Point } from "ol/geom";
@@ -153,21 +153,37 @@ export function setupMap(targetElement: HTMLElement | null) {
     }
 }
 
-export function changeMapType(type: "일반" | "위성") {
+export function changeMapType(
+    type: "일반" | "위성",
+    checkedLayers: Record<string, boolean>,
+    opacity: Record<string, number>
+) {
     vworldMap.getLayers().clear();
 
+    // 지도 배경 추가
     vworldMap.addLayer(type === "위성" ? vworldSatellite : vworldBase);
 
-    if (!vworldMap.getLayers().getArray().includes(measureLayer)) {
-        vworldMap.addLayer(measureLayer);
+    // 공통 기능 레이어 추가
+    vworldMap.addLayer(measureLayer);
+    vworldMap.addLayer(markerLayer);
+
+    // 선택된 산불 레이어 유지
+    if (checkedLayers["fire_today"]) {
+        fireTodayLayer.setOpacity(opacity["fire_today"] / 100);
+        fireTodayLayer.setVisible(true);
+        vworldMap.addLayer(fireTodayLayer);
     }
 
-    if (!vworldMap.getLayers().getArray().includes(markerLayer)) {
-        vworldMap.addLayer(markerLayer);
+    if (checkedLayers["fire_tomorrow"]) {
+        fireTomorrowLayer.setOpacity(opacity["fire_tomorrow"] / 100);
+        fireTomorrowLayer.setVisible(true);
+        vworldMap.addLayer(fireTomorrowLayer);
     }
 
-    if (!vworldMap.getLayers().getArray().includes(egisEcoLayer)) {
-        vworldMap.addLayer(egisEcoLayer);
+    if (checkedLayers["fire_dayAfter"]) {
+        fireDayAfterLayer.setOpacity(opacity["fire_dayAfter"] / 100);
+        fireDayAfterLayer.setVisible(true);
+        vworldMap.addLayer(fireDayAfterLayer);
     }
 }
 

@@ -1,7 +1,7 @@
 import TileLayer from "ol/layer/Tile";
-import { useState, useEffect, useRef } from "react";
-import { vworldMap } from "../../services/VworldApis";
-import { egisEcoLayer } from "../../services/LayerServices";
+import { useState, useEffect } from "react";
+import { vworldMap } from "../../services/VworldApis.ts";
+import { fireTodayLayer, fireTomorrowLayer, fireDayAfterLayer } from "../../services/LayerServices.ts";
 import "../../styles/components/fireservice/fireservice.css";
 
 // 산불 레이어 ID 타입 정의
@@ -16,7 +16,6 @@ type LayerId = typeof fireLayerIds[number] | typeof landslideLayerIds[number];
 // 공통 레이어 라벨 설정
 const layerLabels: Record<LayerId, string> = {
     fire_today: "오늘", fire_tomorrow: "내일", fire_dayAfter: "모레",
-
     landslide_today: "오늘", landslide_tomorrow: "내일", landslide_dayAfter: "모레",
 };
 
@@ -26,53 +25,55 @@ interface FireServiceProps {
 
 const FireService = ({ visible }: FireServiceProps) => {
     const [checkedLayers, setCheckedLayers] = useState<Record<LayerId, boolean>>({
-        fire_today: true, fire_tomorrow: false, fire_dayAfter: false,
+        fire_today: true,
+        fire_tomorrow: false,
+        fire_dayAfter: false,
 
-        landslide_today: false, landslide_tomorrow: false, landslide_dayAfter: false,
+        landslide_today: false,
+        landslide_tomorrow: false,
+        landslide_dayAfter: false,
     });
 
     const [opacity, setOpacity] = useState<Record<LayerId, number>>({
-        fire_today: 50, fire_tomorrow: 50, fire_dayAfter: 50,
+        fire_today: 50,
+        fire_tomorrow: 50,
+        fire_dayAfter: 50,
 
-        landslide_today: 50, landslide_tomorrow: 50, landslide_dayAfter: 50,
+        landslide_today: 50,
+        landslide_tomorrow: 50,
+        landslide_dayAfter: 50,
     });
 
-    const ecologyLayerRef = useRef<TileLayer | null>(null);
-
-    // 임시: 선택된 레이어 중 하나라도 켜져있으면 egisEcoLayer를 표시
     useEffect(() => {
         const allLayerIds = [...fireLayerIds, ...landslideLayerIds];
-        const anyChecked = allLayerIds.some((id) => checkedLayers[id]);
 
-        if (anyChecked) {
-            if (!ecologyLayerRef.current) {
-                const layer = egisEcoLayer;
-                layer.setOpacity(0.5);
-                layer.setVisible(true);
-                vworldMap.addLayer(layer);
-                ecologyLayerRef.current = layer;
-            }
-            else {
-                ecologyLayerRef.current.setVisible(true);
-            }
+        allLayerIds.forEach((id) => {
+            const layer = getLayerById(id);
+            const isChecked = checkedLayers[id];
 
-            const lastChecked = [...allLayerIds].reverse().find((id) => checkedLayers[id]);
-            if (lastChecked && ecologyLayerRef.current) {
-                ecologyLayerRef.current.setOpacity(opacity[lastChecked] / 100);
+            if (isChecked) {
+                if (!vworldMap.getLayers().getArray().includes(layer)) {
+                    layer.setOpacity(opacity[id] / 100);
+                    layer.setVisible(true);
+                    vworldMap.addLayer(layer);
+                } else {
+                    layer.setVisible(true);
+                    layer.setOpacity(opacity[id] / 100);
+                }
+            } else {
+                if (vworldMap.getLayers().getArray().includes(layer)) {
+                    layer.setVisible(false); // 지도에 남기고 비가시화 처리
+                }
             }
-        }
-        else {
-            if (ecologyLayerRef.current) {
-                ecologyLayerRef.current.setVisible(false);
-            }
-        }
+        });
     }, [checkedLayers, opacity]);
 
     const changeOpacity = (id: LayerId, value: number) => {
         setOpacity((prev) => {
             const newOpacity = { ...prev, [id]: value };
-            if (checkedLayers[id] && ecologyLayerRef.current) {
-                ecologyLayerRef.current.setOpacity(value / 100);
+            if (checkedLayers[id]) {
+                const layer = getLayerById(id);
+                layer.setOpacity(value / 100);
             }
             return newOpacity;
         });
@@ -92,15 +93,12 @@ const FireService = ({ visible }: FireServiceProps) => {
                         <img src={`/images/chk_type02_${checkedLayers[id] ? "on" : "off"}.png`} alt="check"
                             className="fire_checkbox" onClick={() => toggleLayerCheck(id)}
                         />
-
                         <span className="fire_layer_label" onClick={() => toggleLayerCheck(id)}>
-                            {layerLabels[id]}
-                        </span>
-
+              {layerLabels[id]}
+            </span>
                         <div className="opacity_box_inline">
                             <span className="opacity_text">{opacity[id]}%</span>
                             <div className="opacity_buttons">
-
                                 <button className="arrow_btn up"
                                     onClick={() => changeOpacity(id, Math.min(100, opacity[id] + 10))}
                                     disabled={!checkedLayers[id]}></button>
@@ -130,3 +128,18 @@ const FireService = ({ visible }: FireServiceProps) => {
 };
 
 export default FireService;
+
+// 🔧 레이어 ID에 맞는 레이어 객체 반환
+function getLayerById(id: LayerId): TileLayer {
+    switch (id) {
+        case "fire_today":
+            return fireTodayLayer;
+        case "fire_tomorrow":
+            return fireTomorrowLayer;
+        case "fire_dayAfter":
+            return fireDayAfterLayer;
+        // 산사태는 아직 연결된 레이어 없음 → 빈 타일로 대체
+        default:
+            return new TileLayer();
+    }
+}

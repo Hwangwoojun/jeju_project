@@ -57,10 +57,17 @@ const Toolbar = ({ onSplitToggle, isSplitMode, activeFireLayers }: toolbarProps)
                 <div className="toolbar_map">
 
                     <button id="base" className={mapType === "일반" ? "active" : ""}
-                        onClick={() => MapTypeChange("일반")}>일반</button>
-
-                    <button id="Satellite" className={mapType === "위성" ? "active" : ""}
-                        onClick={() => MapTypeChange("위성")}>위성</button>
+                        onClick={() => MapTypeChange("일반")}
+                    >
+                        일반
+                    </button>
+                    <button
+                        id="Satellite"
+                        className={mapType === "위성" ? "active" : ""}
+                        onClick={() => MapTypeChange("위성")}
+                    >
+                        위성
+                    </button>
                 </div>
             </div>
 

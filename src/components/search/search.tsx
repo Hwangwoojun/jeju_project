@@ -132,7 +132,7 @@ const Search = ({ visible }: SearchProps) => {
                                     <li className="result_list_item" key={idx}>
                                         <span className="adr">
                                             {mode === "place"
-                                                ? `${item.title ?? "-"} / ${item.address?.road ?? ""} / ${item.address?.parcel ?? ""}`
+                                                ? `${item.title ?? ""} ${item.address?.road ?? ""} ${item.address?.parcel ?? ""}`
                                                 : item.address?.road ?? item.address?.parcel ?? "-"}
                                         </span>
                                         <button onClick={() => {

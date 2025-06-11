@@ -1,4 +1,4 @@
-// const VWORLD_API_KEY = import.meta.env.VITE_VWORLD_API_KEY;
+const VWORLD_API_KEY = import.meta.env.VITE_VWORLD_API_KEY;
 const VWORLD_SEARCH_URL = "https://api.vworld.kr/req/search";
 
 function buildUrl(params: Record<string, string>): string {
@@ -32,7 +32,7 @@ export const searchPlace = (
         request: "search",
         version: "2.0",
         format: "json",
-        key: "994AECF2-9724-327A-A054-AF9534CAE30B",
+        key: VWORLD_API_KEY,
         query: keyword,
         type: "PLACE",
         page: String(page),
@@ -64,7 +64,7 @@ export const searchAddress = (
         request: "search",
         version: "2.0",
         format: "json",
-        key: "994AECF2-9724-327A-A054-AF9534CAE30B",
+        key: VWORLD_API_KEY,
         query: keyword,
         type: "ADDRESS",
         category,

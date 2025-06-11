@@ -3,12 +3,12 @@ import XYZ from "ol/source/XYZ";
 import {Map, View} from "ol";
 import { fromLonLat } from "ol/proj";
 
-// const VWORLD_API_KEY = import.meta.env.VITE_VWORLD_API_KEY;
+const VWORLD_API_KEY = import.meta.env.VITE_VWORLD_API_KEY;
 
 // 기본 지도
 export const vworldBase = new TileLayer({
     source: new XYZ({
-        url: `https://api.vworld.kr/req/wmts/1.0.0/994AECF2-9724-327A-A054-AF9534CAE30B/Base/{z}/{y}/{x}.png`,
+        url: `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Base/{z}/{y}/{x}.png`,
     }),
     properties: { name: "base" },
     minZoom: 6,
@@ -20,7 +20,7 @@ export const vworldBase = new TileLayer({
 // 위성 지도
 export const vworldSatellite = new TileLayer({
     source: new XYZ({
-        url: `https://api.vworld.kr/req/wmts/1.0.0/994AECF2-9724-327A-A054-AF9534CAE30B/Satellite/{z}/{y}/{x}.jpeg`,
+        url: `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Satellite/{z}/{y}/{x}.jpeg`,
     }),
     properties: { name: "satellite" },
     minZoom: 6,

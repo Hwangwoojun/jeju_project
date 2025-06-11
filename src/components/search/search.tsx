@@ -133,7 +133,7 @@ const Search = ({ visible }: SearchProps) => {
                                         <span className="adr">
                                             {mode === "place"
                                               ? `${item.title ?? ""} ${item.address?.road ?? ""} ${item.address?.parcel ?? ""}`
-                                              : item.address?.parcel ?? "-"}
+                                              : item.address?.parcel ?? ""}
                                         </span>
                                         <button onClick={() => {
                                             const lon = parseFloat(item.point?.x);

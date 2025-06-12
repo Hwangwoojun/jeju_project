@@ -20,11 +20,9 @@ function loadJSONP(url: string, callback: Callback) {
         document.body.removeChild(script);
     };
 
-    // JSONP URL 구성 (callback 파라미터 포함)
     script.src = `${url}&callback=${callbackName}`;
     script.type = "text/javascript";
 
-    console.log("[JSONP 요청 URL]", script.src);
     document.body.appendChild(script); // 요청 실행
 }
 

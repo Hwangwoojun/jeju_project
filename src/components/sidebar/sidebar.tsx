@@ -3,7 +3,7 @@ import "../../styles/components/sidebar/sidebar.css";
 import Search from "../../components/search/search.tsx";
 import Fireservice from "../../components/fireservice/fireservice.tsx";
 
-// 🔥 props 타입 추가
+
 type SidebarProps = {
     toggleFireLayer: (layer: "fire_today" | "fire_tomorrow" | "fire_dayAfter", isActive: boolean) => void;
 };
@@ -32,21 +32,17 @@ const Sidebar = ({ toggleFireLayer }: SidebarProps) => {
                     <ul>
                         <li className={activeMenu === "검색" ? "active" : ""} onClick={() => handleClick("검색")}>
                             <a href="#">
-                                <img
-                                    src={`/images/ico_menu01_${activeMenu === "검색" ? "on" : "off"}.png`}
-                                    alt="검색"
-                                    className="con_icon"
-                                />
+
+                                <img src={`/images/ico_menu01_${activeMenu === "검색" ? "on" : "off"}.png`} alt="검색"
+                                    className="con_icon"/>
                                 <span className="sidebar_span">검색</span>
                             </a>
                         </li>
                         <li className={activeMenu === "주제도" ? "active" : ""} onClick={() => handleClick("주제도")}>
                             <a href="#">
-                                <img
-                                    src={`/images/ico_menu02_${activeMenu === "주제도" ? "on" : "off"}.png`}
-                                    alt="주제도"
-                                    className="con_icon"
-                                />
+
+                                <img src={`/images/ico_menu02_${activeMenu === "주제도" ? "on" : "off"}.png`} alt="주제도"
+                                    className="con_icon"/>
                                 <span className="sidebar_span">산불진단 서비스</span>
                             </a>
                         </li>
@@ -59,10 +55,8 @@ const Sidebar = ({ toggleFireLayer }: SidebarProps) => {
             </div>
 
             <button className="sidebar_onoff" onClick={() => setIsOpen(!isOpen)}>
-                <img
-                    src={isOpen ? "/images/ico_lnb_left_arr.png" : "/images/ico_lnb_right_arr.png"}
-                    alt="onoff"
-                />
+
+                <img src={isOpen ? "/images/ico_lnb_left_arr.png" : "/images/ico_lnb_right_arr.png"} alt="onoff"/>
             </button>
         </div>
     );
